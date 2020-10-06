@@ -9,7 +9,7 @@ Now that you have a full project running, let's explore two options frequently u
 
 ## Key Concepts
 
-Shared Backend - it is common to have multiple front end applications sharing a common backend in one single AWS account.  For example, you might have a tvOS, Android, Android, and web frontends, all sharing the same API, database, storage, and user authentication.
+Shared Backend - it is common to have multiple front end applications sharing a common backend in one single AWS account.  For example, you might have a tvOS, iOS, Android, and web frontends, all sharing the same API, database, storage, and user authentication.
 
 # Implementation
 
