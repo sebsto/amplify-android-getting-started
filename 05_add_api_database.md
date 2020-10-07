@@ -76,21 +76,18 @@ To generate the code, in your terminal, **execute the following command**:
 amplify codegen models
 ```
 
-This creates Swift files in `amplify/generated/models` directory, as you can see with:
+This creates Java files in `java/com/amplifyframework.datastore.generated.model` directory, as you can see with:
 
 ```zsh
-➜  Android Getting Started git:(master) ✗ ls -al amplify/generated/models
+➜  Android Getting Started git:(master) ✗ ls -al app/src/main/java/com/amplifyframework/datastore/generated/model 
 total 24
-drwxr-xr-x  5 stormacq  admin  160 Jul  9 14:20 .
-drwxr-xr-x  3 stormacq  admin   96 Jul  9 14:20 ..
--rw-r--r--  1 stormacq  admin  380 Jul  9 14:20 AmplifyModels.swift
--rw-r--r--  1 stormacq  admin  822 Jul  9 14:20 NoteData+Schema.swift
--rw-r--r--  1 stormacq  admin  445 Jul  9 14:20 NoteData.swift
+drwxr-xr-x  4 stormacq  admin   128 Oct  7 15:27 .
+drwxr-xr-x  3 stormacq  admin    96 Oct  7 15:27 ..
+-rw-r--r--  1 stormacq  admin  1412 Oct  7 15:27 AmplifyModelProvider.java
+-rw-r--r--  1 stormacq  admin  7153 Oct  7 15:27 NoteData.java
 ```
 
-Import these files in your Android Studio project: **locate** them in the Finder and **drag'n drop them** to the project in Android Studio.
-
-![Insert generated files in the project](img/05_10.gif)
+The files are automatically imported into your project.
 
 ## Deploy the API service and database
 
@@ -115,305 +112,475 @@ GraphQL endpoint: https://yourid.appsync-api.eu-central-1.amazonaws.com/graphql
 
 ## Add API client library to the Android Studio project
 
-Before going to the code, you add the Amplify API Library to the dependencies of your project.  Open the `Podfile` file and **add the line** with `AmplifyPlugins/AWSAPIPlugin` or copy / paste the entire file below.
+Before going to the code, add the following dependency to your app‘s `build.gradle` along with others you added before and click **Sync Now** when prompted:
 
-```Podfile
-# you need at least version 13.0 for this tutorial, more recent versions are valid too
-platform :android, '13.0'
-
-target 'getting started' do
-  # Comment the next line if you don't want to use dynamic frameworks
-  use_frameworks!
-
-  # Pods for getting started
-  pod 'Amplify', '~> 1.0'                             # required amplify dependency
-  pod 'Amplify/Tools', '~> 1.0'                       # allows to call amplify CLI from within Android Studio
-
-  pod 'AmplifyPlugins/AWSCognitoAuthPlugin', '~> 1.0' # support for Cognito user authentication
-  pod 'AmplifyPlugins/AWSAPIPlugin', '~> 1.0'         # support for GraphQL API
-
-end
-```
-
-In a terminal, **execute the command**:
-
-```zsh
-pod install
-```
-
-The command takes a few moments to complete. You should see this (actual version numbers may vary):
-
-```zsh
-Analyzing dependencies
-Downloading dependencies
-Installing AmplifyPlugins 1.0.4
-Installing AppSyncRealTimeClient (1.1.6)
-Installing ReachabilitySwift (5.0.0)
-Installing Starscream (3.0.6)
-Generating Pods project
-Integrating client project
-Pod installation complete! There are 4 dependencies from the Podfile and 11 total pods installed.
+```gradle
+dependencies {
+    implementation 'com.amplifyframework:aws-api:1.4.0'
+}
 ```
 
 ## Initialize Amplify Libs at Runtime
 
-Back to Android Studio, open `Backend.swift` and add a line in the Amplify initialisation sequence in `private init()` method. Complete code block should lool like this:
+Back to Android Studio, open `Backend.kt` and add a line in the Amplify initialisation sequence in `initialize()` method. Complete try/catch block should lool like this:
 
-```Swift
-// initialize amplify
-do {
-   try Amplify.add(plugin: AWSCognitoAuthPlugin())
-   try Amplify.add(plugin: AWSAPIPlugin(modelRegistration: AmplifyModels()))
-   try Amplify.configure()
-   print("Initialized Amplify")
-} catch {
-   print("Could not initialize Amplify: \(error)")
+```kotlin
+try {
+    Amplify.addPlugin(AWSCognitoAuthPlugin())
+    Amplify.addPlugin(AWSApiPlugin())
+    Amplify.configure(applicationContext)
+
+    Log.i(TAG, "Initialized Amplify")
+} catch (e: AmplifyException) {
+    Log.e(TAG, "Could not initialize Amplify", e)
 }
 ```
 
 ## Add bridging between GraphQL data model and app model
 
 Our project already has a data model to represent a `Note`. So I made a design decision to continue to use that model and provide for an easy way to convert a `NoteData` to a `Note`.
-Open `ContentView.swift` and add this initializer in the `Note` class
+Open `UserData.kt` and add two components : a dynamic property that returns a `NoteData` object from a `UserData.Note`, and the opposite : a static method that accepts an API `NoteData` and return a `Userdata.Note`.
 
-```swift
-convenience init(from data: NoteData) {
-    self.init(id: data.id, name: data.name, description: data.description, image: data.image)
- 
-    // store API object for easy retrieval later
-    self._data = data
-}
+Inside the data class `Note`, add the following:
 
-fileprivate var _data : NoteData?
+```kotlin
+// return an API NoteData from this Note object
+val data : NoteData
+    get() = NoteData.builder()
+            .name(this.name)
+            .description(this.description)
+            .image(this.imageName)
+            .id(this.id)
+            .build()
 
-// access the privately stored NoteData or build one if we don't have one.
-var data : NoteData {
-
-    if (_data == nil) {
-        _data = NoteData(id: self.id,
-                            name: self.name,
-                            description: self.description,
-                            image: self.imageName)
+// static function to create a Note from a NoteData API object
+companion object {
+    fun from(noteData : NoteData) : Note {
+        val result = Note(noteData.id, noteData.name, noteData.description, noteData.image)
+        // some additional code will come here later
+        return result
     }
-
-    return _data!
-}
+}            
 ```
+
+Be sure to import the `NoteData` class from the generated code.
 
 ## Add API CRUD Methods to the `Backend` Class
 
 Let's add 3 methods to call our API: a method to query the Note, a method to create a new Note, and a method to delete a Note. Notice that these method works on the app data model (`Note`) to make it easy to interract from the User Interface. These method transparently convert `Note` to GraphQL's `NoteData` objects.
 
-**Open** the `Backend.swift` file and **add the following** snippet at the end of the `Backend` class:
+**Open** the `Backend.kt` file and **add the following** snippet at the end of the `Backend` class:
 
-```swift
-    // MARK: API Access
+```kotlin
+fun queryNotes() {
+    Log.i(TAG, "Querying notes")
 
-    func queryNotes() {
-
-        Amplify.API.query(request: .list(NoteData.self)) { event in
-            switch event {
-            case .success(let result):
-                switch result {
-                case .success(let notesData):
-                    print("Successfully retrieved list of Notes")
-
-                    // convert an array of NoteData to an array of Note class instances
-                    for n in notesData {
-                        let note = Note.init(from: n)
-                        DispatchQueue.main.async() {
-                            UserData.shared.notes.append(note)
-                        }
-                    }
-
-                case .failure(let error):
-                    print("Can not retrieve result : error  \(error.errorDescription)")
-                }
-            case .failure(let error):
-                print("Can not retrieve Notes : error \(error)")
+    Amplify.API.query(
+        ModelQuery.list(NoteData::class.java),
+        { response ->
+            Log.i(TAG, "Queried")
+            for (noteData in response.data) {
+                Log.i(TAG, noteData.name)
+                // TODO should add all the notes at once instead of one by one (each add triggers a UI refresh)
+                UserData.shared.addNote(UserData.Note.from(noteData))
             }
-        }
-    }
-
-    func createNote(note: Note) {
-
-        // use note.data to access the NoteData instance
-        Amplify.API.mutate(request: .create(note.data)) { event in
-            switch event {
-            case .success(let result):
-                switch result {
-                case .success(let data):
-                    print("Successfully created note: \(data)")
-                case .failure(let error):
-                    print("Got failed result with \(error.errorDescription)")
-                }
-            case .failure(let error):
-                print("Got failed event with error \(error)")
-            }
-        }
-    }
-
-    func deleteNote(note: Note) {
-
-        // use note.data to access the NoteData instance
-        Amplify.API.mutate(request: .delete(note.data)) { event in
-            switch event {
-            case .success(let result):
-                switch result {
-                case .success(let data):
-                    print("Successfully deleted note: \(data)")
-                case .failure(let error):
-                    print("Got failed result with \(error.errorDescription)")
-                }
-            case .failure(let error):
-                print("Got failed event with error \(error)")
-            }
-        }
-    }
-```
-
-Finally, we must call the API to query the list of `Note` for the currently signed in user when the application starts. **Add** this piece of code in the `Backend`'s `private init()` method:
-
-```swift
-// inside private init() method
-// let's check if user is signedIn or not
-Amplify.Auth.fetchAuthSession { (result) in
-
-    do {
-        let session = try result.get()
-
-        // let's update UserData and the UI
-        self.updateUserData(withSignInStatus: session.isSignedIn)
-
-    } catch {
-        print("Fetch auth session failed with error - \(error)")
-    }
-
+        },
+        { error -> Log.e(TAG, "Query failure", error) }
+    )
 }
-````
 
-In the same `Backend.swift`file, update the `updateUserData(withSignInStatus:)` method to look like this:
+fun createNote(note : UserData.Note) {
+    Log.i(TAG, "Creating notes")
 
-```swift
-// change our internal state, this triggers an UI update on the main thread
-func updateUserData(withSignInStatus status : Bool) {
-    DispatchQueue.main.async() {
-        let userData : UserData = .shared
-        userData.isSignedIn = status
+    Amplify.API.mutate(
+        ModelMutation.create(note.data),
+        { response ->
+            Log.i(TAG, "Created")
+            if (response.hasErrors()) {
+                Log.e(TAG, response.errors.first().message)
+            } else {
+                Log.i(TAG, "Created Note with id: " + response.data.id)
+            }
+        },
+        { error -> Log.e(TAG, "Create failed", error) }
+    )
+}
 
-        // when user is signed in, query the database, otherwise empty our model
-        if status {
-            self.queryNotes()
-        } else {
-            userData.notes = []
-        }
+fun deleteNote(note : UserData.Note?) {
+
+    if (note == null) return
+
+    Log.i(TAG, "Deleting note $note")
+
+    Amplify.API.mutate(
+        ModelMutation.delete(note.data),
+        { response ->
+            Log.i(TAG, "Deleted")
+            if (response.hasErrors()) {
+                Log.e(TAG, response.errors.first().message)
+            } else {
+                Log.i(TAG, "Deleted Note $response")
+            }
+        },
+        { error -> Log.e(TAG, "Delete failed", error) }
+    )
+}
+```
+Be sure to import the `ModelQuery`, `ModelMutation`, and `NoteData` class from the generated code.
+
+Finally, we must call the API to query the list of `Note` for the currently signed in user when the application starts. 
+
+In the `Backend.kt`file, update the `updateUserData(withSignInStatus: Boolean)` method to look like this:
+
+```kotlin
+// change our internal state and query list of notes 
+private fun updateUserData(withSignedInStatus : Boolean) {
+    val userData = UserData.shared
+    userData.setSignedIn(withSignedInStatus)
+
+    val notes = userData.notes().value
+    val isEmpty = notes?.isEmpty() ?: false
+
+    // query notes when signed in and we do not have Notes yet
+    if (withSignedInStatus && isEmpty ) {
+        this.queryNotes()
+    } else {
+        userData.resetNotes()
     }
 }
 ```
 
 Now, all is left is to create a piece of user interface to create a new `Note` and to delete a `Note` from the list.
 
-## Add an Edit Button to Add Note
+## Add an Add Button to Add Note
 
 Now that the backend and data model pieces are in place, the last step in this section is to allow users to create a new `Note` and to delete them.
 
-In Android Studio, open `ContentView.swift`
+1. In Android Studio, under `res/layout`, create a new layout : right click **layout** and select **New**, then **Layout Resource File**. Name it `activity_add_note` and accept all the other default value. Click **OK**.
 
-1. In `ContentView` struct, **add** state variables bound to the user interface.
+    ![android studio create activity_add_note](img/05_10.png)
 
-    ```swift
-    // add at the begining of ContentView class
-    @State var showCreateNote = false
+    Open the file just created `activity_add_note` and **replace** the generated code by pasting the below:
 
-    @State var name : String        = "New Note"
-    @State var description : String = "This is a new note"
-    @State var image : String       = "image"
+    ```xml
+    <?xml version="1.0" encoding="utf-8"?>
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Create a New Note"
+                android:textSize="10pt" />
+
+            <EditText
+                android:id="@+id/name"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="name"
+                android:inputType="text"
+                android:lines="5" />
+
+            <EditText
+                android:id="@+id/description"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:hint="description"
+                android:inputType="textMultiLine"
+                android:lines="3" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/addNote"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:backgroundTint="#009688"
+                android:text="Add Note" />
+
+            <Button
+                android:id="@+id/cancel"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:backgroundTint="#FFC107"
+                android:text="Cancel" />
+
+        </LinearLayout>
+    </ScrollView>
     ```
 
-2. Anywhere in the file, **add** a `View` struct to let user create a new `Note` :
+    This is a very simple layout (bear with me, I am not a graphic designer) allowing to enter a Note title and description.
 
-    ```swift
-    struct AddNoteView: View {
-        @Binding var isPresented: Bool
-        var userData: UserData
+2. Add a `AddNoteActivity` class.
 
-        @State var name : String        = "New Note"
-        @State var description : String = "This is a new note"
-        @State var image : String       = "image"
-        var body: some View {
-            Form {
+   Under `java/com.example.androidgettingstarted` create a new kotlin file `AddActivityNote.kt`, open it and add this code:
 
-                Section(header: Text("TEXT")) {
-                    TextField("Name", text: $name)
-                    TextField("Name", text: $description)
-                }
+    ```kotlin
+    package com.example.androidgettingstarted
 
-                Section(header: Text("PICTURE")) {
-                    TextField("Name", text: $image)
-                }
+    import android.os.Bundle
+    import androidx.appcompat.app.AppCompatActivity
+    import kotlinx.android.synthetic.main.activity_add_note.*
+    import java.util.*
 
-                Section {
-                    Button(action: {
-                        self.isPresented = false
-                        let noteData = NoteData(id : UUID().uuidString,
-                                                name: self.$name.wrappedValue,
-                                                description: self.$description.wrappedValue)
-                        let note = Note(from: noteData)
+    class AddNoteActivity : AppCompatActivity()  {
 
-                        // asynchronously store the note (and assume it will succeed)
-                        Backend.shared.createNote(note: note)
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            setContentView(R.layout.activity_add_note)
 
-                        // add the new note in our userdata, this will refresh UI
-                        self.userData.notes.append(note)
-                    }) {
-                        Text("Create this note")
-                    }
-                }
+            cancel.setOnClickListener {
+                this.finish()
             }
+
+            addNote.setOnClickListener {
+
+                val userData = UserData.shared
+
+                // create a note object
+                val note = UserData.Note(
+                    UUID.randomUUID().toString(),
+                    name?.text.toString(),
+                    description?.text.toString()
+                )
+
+                // store it in the backend
+                Backend.shared.createNote(note)
+
+                // add it to UserData, this will trigger a UI refresh
+                userData.addNote(note)
+
+                // close activity
+                this.finish()
+            }
+        }
+
+        companion object {
+            private const val TAG = "AddNoteActivity"
+        }
+    }    
+    ```
+
+    Finally, under `manifests`, open `AndroidManifest.xml` and add this activity element anywhere within the application node.
+
+    ```xml
+    <activity
+        android:name=".AddNoteActivity"
+        android:label="Add Note"
+        android:theme="@style/AppTheme.NoActionBar">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.example.androidgettingstarted.MainActivity" />
+    </activity>
+    ```
+
+3. At a "Add Note" [FloatingActionButton](https://developer.android.com/reference/com/google/android/material/floatingactionbutton/FloatingActionButton) in the Main Activity. Under `res/layout`, open `activity_main.xml` and add this above the existing Floating Action Button.
+
+    ```xml
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAdd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:visibility="invisible"
+        android:src="@drawable/ic_baseline_post_add"
+        app:fabCustomSize="60dp"
+        app:fabSize="auto"/>
+    ```
+
+    Add a "Add Note" icon in `res/drawable`. Right click `drawable`, select **New**, then **Vector Asset**. Enter **ic_baseline_add** as name and chose the add icon from the Clip Art. Click **Next** and **Finish**.
+
+    ![android studio create add note icon](img/05_20.png)
+
+4. Add code to handle the "Add Note" button.
+
+    The last two things to do to have a fully functional "Add Button" is to make the button appear or disappear according to the `isSignedIn` value, and, obsviously, to add code to handle taps on the button.
+
+    Open `mainActivity.kt` and add this at the end of `onCreate()` method :
+
+    ```kotlin
+    // register a click listener
+    fabAdd.setOnClickListener {
+        startActivity(Intent(this, AddNoteActivity::class.java))
+    }
+    ```
+
+    Then, still in the `onCreate()` method replace `userData.isSignedIn.observe` with this :
+
+    ```kotlin
+    userData.isSignedIn.observe(this, Observer<Boolean> { isSignedUp ->
+        // update UI
+        Log.i(TAG, "isSignedIn changed : $isSignedUp")
+
+        //animation inspired by https://www.11zon.com/zon/android/multiple-floating-action-button-android.php
+        if (isSignedUp) {
+            fabAuth.setImageResource(R.drawable.ic_baseline_lock_open)
+            Log.d(TAG, "Showing fabADD")
+            fabAdd.show()
+            fabAdd.animate().translationY(0.0F - 1.1F * fabAuth.customSize)
+        } else {
+            fabAuth.setImageResource(R.drawable.ic_baseline_lock)
+            Log.d(TAG, "Hiding fabADD")
+            fabAdd.hide()
+            fabAdd.animate().translationY(0.0F)
+        }
+    })    
+    ```
+
+To verify everything works as expected, build the project. Click **Build** menu and select **Make Project** or, on Macs, type **&#8984;F9**. There should be no error.    
+
+When you run the application, you see the "Add Note" button appear when user signs in and disappear when user signout. You can now add a note.
+
+## Add a Swipe to Delete Behaviour
+
+The swipe-to-delete behaviour can be added by adding a touch handler to the list of Note. The touch handler is in charge of drawing the red background, the delete icon, and to call the `Backend.delete()` method when the touch is release.
+
+1. Create a new class SimpleTouchCallback. Under `java/com`, right click `example.androidgettingstarted`, select **New** then **Kotlin File**, enter **SwipeCallback** as name.
+
+    ![android studio create activity_add_note](img/05_30.png)
+
+    Paste the code below in that new file:
+
+    ```kotlin
+    package com.example.androidgettingstarted
+
+    import android.graphics.Canvas
+    import android.graphics.Color
+    import android.graphics.drawable.ColorDrawable
+    import android.graphics.drawable.Drawable
+    import android.util.Log
+    import android.widget.Toast
+    import androidx.appcompat.app.AppCompatActivity
+    import androidx.core.content.ContextCompat
+    import androidx.recyclerview.widget.ItemTouchHelper
+    import androidx.recyclerview.widget.RecyclerView
+
+
+    // https://stackoverflow.com/questions/33985719/android-swipe-to-delete-recyclerview
+    class SwipeCallback(private val activity: AppCompatActivity): ItemTouchHelper.SimpleCallback(
+        0,
+        ItemTouchHelper.LEFT
+    ) {
+
+        private val TAG: String = "SimpleItemTouchCallback"
+        private val icon: Drawable? = ContextCompat.getDrawable(
+            activity,
+            R.drawable.ic_baseline_delete_sweep
+        )
+        private val background: ColorDrawable = ColorDrawable(Color.RED)
+
+        override fun onChildDraw(
+            c: Canvas,
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            dX: Float,
+            dY: Float,
+            actionState: Int,
+            isCurrentlyActive: Boolean
+        ) {
+            super.onChildDraw(
+                c,
+                recyclerView,
+                viewHolder,
+                dX,
+                dY,
+                actionState,
+                isCurrentlyActive
+            )
+            val itemView = viewHolder.itemView
+            val backgroundCornerOffset = 20
+            val iconMargin = (itemView.height - icon!!.intrinsicHeight) / 2
+            val iconTop = itemView.top + (itemView.height - icon.intrinsicHeight) / 2
+            val iconBottom = iconTop + icon.intrinsicHeight
+            val iconRight: Int = itemView.right - iconMargin
+            if (dX < 0) {
+                val iconLeft: Int = itemView.right - iconMargin - icon.intrinsicWidth
+                icon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                background.setBounds(
+                    itemView.right + dX.toInt() - backgroundCornerOffset,
+                    itemView.top, itemView.right, itemView.bottom
+                )
+                background.draw(c)
+                icon.draw(c)
+            } else {
+                background.setBounds(0, 0, 0, 0)
+                background.draw(c)
+            }
+        }
+
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            Toast.makeText(activity, "Moved", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
+
+            Toast.makeText(activity, "deleted", Toast.LENGTH_SHORT).show()
+
+            //Remove swiped item from list and notify the RecyclerView
+            Log.d(TAG, "Going to remove ${viewHolder.adapterPosition}")
+
+            // get the position of the swiped item in the list
+            val position = viewHolder.adapterPosition
+            val userData = UserData.shared
+
+            // remove to note from the userdata will refresh the UI
+            val note = userData.deleteNote(position)
+
+            // async remove from backend
+            Backend.shared.deleteNote(note)
         }
     }
     ```
 
-3. Add a `+` button on the navigation bar to present a sheet to create a `Note`
+    The important lines of code are in the `onSwiped()` method. This method is called when the swipe gesture finishes. We collect the position in the list for the swiped item, and we remove the corresponding note from the `UserData` structure (this updates the UI) and from the cloud backend.
 
-    Back to `ContentView` struct, **replace** `.navigationBarItems(leading: SignOutButton())` with
+2. Now that we have a class, let's add a "Delete" icon in `res/drawable`. Right click `drawable`, select **New**, then **Vector Asset**. Enter **ic_baseline_delete_sweep** as name and chose the "delete sweep" icon from the Clip Art. Click **Next** and **Finish**.
 
-    ```Swift
-        .navigationBarItems(leading: SignOutButton(),
-                            trailing: Button(action: {
-            self.showCreateNote.toggle()
-        }) {
-            Image(systemName: "plus")
-        })
-    }.sheet(isPresented: $showCreateNote) {
-        AddNoteView(isPresented: self.$showCreateNote, userData: self.userData)
+    ![android studio create add note icon](img/05_45.png)
+
+3. Add the Swipe to delete gesture handler to the `RecyclerView`.
+
+    Under `java/com/example.androidgettingstarted`, open `MainActivity.kt` and add these two lines of code in `setupRecyclerView`:
+
+    ```kotlin
+    // add a touch gesture handler to manager the swipe to delete gesture
+    val itemTouchHelper = ItemTouchHelper(SwipeCallback(this))
+    itemTouchHelper.attachToRecyclerView(recyclerView)
     ```
-
-## Add a Swipe to Delete Behaviour
-
-Finally, in `ContentView`, add the 'swipe to delete' behaviour: **add** the `.onDelete { }` method to the `ForEach` struct:
-
-```swift
-ForEach(userData.notes) { note in
-    ListRow(note: note)
-}.onDelete { indices in
-    indices.forEach {
-        // removing from user data will refresh UI
-        let note = self.userData.notes.remove(at: $0)
-
-        // asynchronously remove from database
-        Backend.shared.deleteNote(note: note)
-    }
-}
-```
 
 ## Build and Test
 
-To verify everything works as expected, build and run the project. Click **Product** menu and select **Run** or type **&#8984;R**. There should be no error.
+To verify everything works as expected, build and run the project.Click **Run** icon ▶️ in the toolbar or type **^ R**. There should be no error.
 
-Assuming you are still signed in, the app starts on the emply List. It now has a `+` button to add a Note.  **Tap the + sign**, **Tap Create this Note** and the note should appear in the list.
-
-You can close the `AddNoteView` by pulling it down.  Note that, on the Android simulator, it is not possible to tap `+` a second time, you need to 'pull-to-refresh' the List first.
+Assuming you are still signed in, the app starts on the emply List. It now has a `Add Note` button to add a Note.  **Tap the Add Note sign**, **enter a title**, **enter a description**, **Tap Add Note** button and the note should appear in the list.
 
 You can delete Note by swiping a row left.
 
@@ -421,7 +588,7 @@ Here is the complete flow.
 
 | Empty List | Create a Note | One Note in the List | Delete a Note |
 | --- | --- | --- | --- |
-| ![Empty List](img/05_20.png) | ![Create Note](img/05_30.png) | ![One Note in the List](img/05_40.png) | ![Delete a Note ](img/05_50.png) |
+| ![Empty List](img/05_40.png) | ![Create Note](img/05_50.png) | ![One Note in the List](img/05_60.png) | ![Delete a Note ](img/05_70.gif) |
 
 In the next section, we will add UI and behavior to manage pictures.
 
