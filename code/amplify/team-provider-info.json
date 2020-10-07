@@ -10,6 +10,13 @@
       "StackName": "amplify-androidgettingstarte-dev-181837",
       "StackId": "arn:aws:cloudformation:eu-central-1:486652066693:stack/amplify-androidgettingstarte-dev-181837/97fe3690-07ef-11eb-8ee5-0a233b5d9d4c",
       "AmplifyAppId": "d3n09leij5nqsj"
+    },
+    "categories": {
+      "auth": {
+        "androidgettingstarte63ddb617": {
+          "hostedUIProviderCreds": "[]"
+        }
+      }
     }
   }
 }
