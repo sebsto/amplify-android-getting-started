@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_main.*
@@ -23,10 +24,17 @@ class MainActivity : AppCompatActivity() {
             // update UI
             Log.i(TAG, "isSignedIn changed : $isSignedUp")
 
+            //animation inspired by https://www.11zon.com/zon/android/multiple-floating-action-button-android.php
             if (isSignedUp) {
                 fabAuth.setImageResource(R.drawable.ic_baseline_lock_open)
+                Log.d(TAG, "Showing fabADD")
+                fabAdd.show()
+                fabAdd.animate().translationY(0.0F - 1.1F * fabAuth.customSize)
             } else {
                 fabAuth.setImageResource(R.drawable.ic_baseline_lock)
+                Log.d(TAG, "Hiding fabADD")
+                fabAdd.hide()
+                fabAdd.animate().translationY(0.0F)
             }
         })
 
@@ -35,6 +43,11 @@ class MainActivity : AppCompatActivity() {
 
         //setup auth button
         setupAuthButton(userData)
+
+        // register a click listener
+        fabAdd.setOnClickListener {
+            startActivity(Intent(this, AddNoteActivity::class.java))
+        }
     }
 
     // receive the web redirect after authentication
@@ -73,6 +86,9 @@ class MainActivity : AppCompatActivity() {
             // let's create a RecyclerViewAdapter that manages the individual cells
             recyclerView.adapter = NoteRecyclerViewAdapter(notes)
 
+            // add a touch gesture handler to manager the swipe to delete gesture
+            val itemTouchHelper = ItemTouchHelper(SwipeCallback(this))
+            itemTouchHelper.attachToRecyclerView(recyclerView)
         })
     }
 

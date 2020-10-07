@@ -23,6 +23,18 @@
     <include layout="@layout/content_main" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAdd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:visibility="invisible"
+        android:src="@drawable/ic_baseline_post_add"
+        app:fabCustomSize="60dp"
+        app:fabSize="auto"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAuth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

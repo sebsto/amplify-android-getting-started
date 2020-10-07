@@ -5,6 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.amplifyframework.AmplifyException
+import com.amplifyframework.api.aws.AWSApiPlugin
+import com.amplifyframework.api.graphql.model.ModelMutation
+import com.amplifyframework.api.graphql.model.ModelQuery
 import com.amplifyframework.auth.AuthChannelEventName
 import com.amplifyframework.auth.AuthException
 import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin
@@ -13,6 +16,7 @@ import com.amplifyframework.auth.result.AuthSessionResult
 import com.amplifyframework.auth.result.AuthSignInResult
 import com.amplifyframework.core.Amplify
 import com.amplifyframework.core.InitializationStatus
+import com.amplifyframework.datastore.generated.model.NoteData
 import com.amplifyframework.hub.HubChannel
 import com.amplifyframework.hub.HubEvent
 
@@ -27,6 +31,7 @@ class Backend private constructor() {
     fun initialize(applicationContext: Context) : Backend {
         try {
             Amplify.addPlugin(AWSCognitoAuthPlugin())
+            Amplify.addPlugin(AWSApiPlugin())
             Amplify.configure(applicationContext)
 
             Log.i(TAG, "Initialized Amplify")
@@ -82,9 +87,20 @@ class Backend private constructor() {
         return this
     }
 
+    // change our internal state and query list of notes
     private fun updateUserData(withSignedInStatus : Boolean) {
         val userData = UserData.shared
         userData.setSignedIn(withSignedInStatus)
+
+        val notes = userData.notes().value
+        val isEmpty = notes?.isEmpty() ?: false
+
+        // query notes when signed in and we do not have Notes yet
+        if (withSignedInStatus && isEmpty ) {
+            this.queryNotes()
+        } else {
+            userData.resetNotes()
+        }
     }
 
     fun signOut() {
@@ -111,5 +127,59 @@ class Backend private constructor() {
         if (requestCode == AWSCognitoAuthPlugin.WEB_UI_SIGN_IN_ACTIVITY_CODE) {
             Amplify.Auth.handleWebUISignInResponse(data)
         }
+    }
+
+    fun queryNotes() {
+        Log.i(TAG, "Querying notes")
+
+        Amplify.API.query(
+            ModelQuery.list(NoteData::class.java),
+            { response ->
+                Log.i(TAG, "Queried")
+                for (noteData in response.data) {
+                    Log.i(TAG, noteData.name)
+                    // TODO should add all the notes at once instead of one by one (each add triggers a UI refresh)
+                    UserData.shared.addNote(UserData.Note.from(noteData))
+                }
+            },
+            { error -> Log.e(TAG, "Query failure", error) }
+        )
+    }
+
+    fun createNote(note : UserData.Note) {
+        Log.i(TAG, "Creating notes")
+
+        Amplify.API.mutate(
+            ModelMutation.create(note.data),
+            { response ->
+                Log.i(TAG, "Created")
+                if (response.hasErrors()) {
+                    Log.e(TAG, response.errors.first().message)
+                } else {
+                    Log.i(TAG, "Created Note with id: " + response.data.id)
+                }
+            },
+            { error -> Log.e(TAG, "Create failed", error) }
+        )
+    }
+
+    fun deleteNote(note : UserData.Note?) {
+
+        if (note == null) return
+
+        Log.i(TAG, "Deleting note $note")
+
+        Amplify.API.mutate(
+            ModelMutation.delete(note.data),
+            { response ->
+                Log.i(TAG, "Deleted")
+                if (response.hasErrors()) {
+                    Log.e(TAG, response.errors.first().message)
+                } else {
+                    Log.i(TAG, "Deleted Note $response")
+                }
+            },
+            { error -> Log.e(TAG, "Delete failed", error) }
+        )
     }
 }

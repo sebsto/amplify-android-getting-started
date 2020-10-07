@@ -28,6 +28,15 @@
         </activity>
 
         <activity
+            android:name=".AddNoteActivity"
+            android:label="Add Note"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.androidgettingstarted.MainActivity" />
+        </activity>
+
+        <activity
             android:name="com.amazonaws.mobileconnectors.cognitoauth.activities.CustomTabsRedirectActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
