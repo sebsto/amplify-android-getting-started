@@ -329,7 +329,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val TAG = "ItemListActivity"
+        private const val TAG = "MainActivity"
     }
 }
 ```
