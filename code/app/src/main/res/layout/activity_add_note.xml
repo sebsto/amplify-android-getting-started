@@ -52,7 +52,7 @@
             android:layout_weight="1" />
 
         <Button
-            android:id="@+id/camera_capture_button"
+            android:id="@+id/captureImage"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

@@ -89,5 +89,9 @@ class SwipeCallback(private val activity: AppCompatActivity): ItemTouchHelper.Si
         // async remove from backend
         Backend.shared.deleteNote(note)
 
+        if (note?.imageName != null) {
+            //asynchronously delete the image (and assume it will work)
+            Backend.shared.deleteImage(note.imageName!!)
+        }
     }
 }

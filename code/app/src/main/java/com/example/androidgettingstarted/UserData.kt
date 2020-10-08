@@ -65,9 +65,6 @@ class UserData private constructor() {
     data class Note(val id: String, val name: String, val description: String, var imageName: String? = null) {
         override fun toString(): String = name
 
-        // bitmap image
-        var image : Bitmap? = null
-
         // return an API NoteData from this Note object
         val data : NoteData
             get() = NoteData.builder()
@@ -77,11 +74,22 @@ class UserData private constructor() {
                 .id(this.id)
                 .build()
 
+        // bitmap image
+        var image : Bitmap? = null
+
         // static function to create a Note from a NoteData API object
         companion object {
             fun from(noteData : NoteData) : Note {
                 val result = Note(noteData.id, noteData.name, noteData.description, noteData.image)
-                // some additional code will come here later
+                if (noteData.image != null) {
+                    Backend.shared.retrieveImage(noteData.image!!) {
+                        //result.setImage(it)
+                        result.image = it
+
+                        // force a UI update
+                        with(shared) { notifyObserver() }
+                    }
+                }
                 return result
             }
         }

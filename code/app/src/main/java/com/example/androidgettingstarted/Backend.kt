@@ -3,6 +3,8 @@ package com.example.androidgettingstarted
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import com.amplifyframework.AmplifyException
 import com.amplifyframework.api.aws.AWSApiPlugin
@@ -19,6 +21,13 @@ import com.amplifyframework.core.InitializationStatus
 import com.amplifyframework.datastore.generated.model.NoteData
 import com.amplifyframework.hub.HubChannel
 import com.amplifyframework.hub.HubEvent
+import com.amplifyframework.storage.StorageAccessLevel
+import com.amplifyframework.storage.options.StorageDownloadFileOptions
+import com.amplifyframework.storage.options.StorageRemoveOptions
+import com.amplifyframework.storage.options.StorageUploadFileOptions
+import com.amplifyframework.storage.s3.AWSS3StoragePlugin
+import java.io.File
+import java.io.FileInputStream
 
 class Backend private constructor() {
 
@@ -32,6 +41,8 @@ class Backend private constructor() {
         try {
             Amplify.addPlugin(AWSCognitoAuthPlugin())
             Amplify.addPlugin(AWSApiPlugin())
+            Amplify.addPlugin(AWSS3StoragePlugin())
+
             Amplify.configure(applicationContext)
 
             Log.i(TAG, "Initialized Amplify")
@@ -180,6 +191,58 @@ class Backend private constructor() {
                 }
             },
             { error -> Log.e(TAG, "Delete failed", error) }
+        )
+    }
+
+    fun storeImage(filePath: String, key: String) {
+        val file = File(filePath)
+        val options = StorageUploadFileOptions.builder()
+            .accessLevel(StorageAccessLevel.PRIVATE)
+            .build()
+
+        Amplify.Storage.uploadFile(
+            key,
+            file,
+            options,
+            { progress -> Log.i(TAG, "Fraction completed: ${progress.fractionCompleted}") },
+            { result -> Log.i(TAG, "Successfully uploaded: " + result.key) },
+            { error -> Log.e(TAG, "Upload failed", error) }
+        )
+    }
+
+    fun deleteImage(key : String) {
+
+        val options = StorageRemoveOptions.builder()
+            .accessLevel(StorageAccessLevel.PRIVATE)
+            .build()
+
+        Amplify.Storage.remove(
+            key,
+            options,
+            { result -> Log.i(TAG, "Successfully removed: " + result.key) },
+            { error -> Log.e(TAG, "Remove failure", error) }
+        )
+    }
+
+    fun retrieveImage(key: String, completed : (image: Bitmap) -> Unit) {
+        val options = StorageDownloadFileOptions.builder()
+            .accessLevel(StorageAccessLevel.PRIVATE)
+            .build()
+
+        val file = File.createTempFile("image", ".image")
+
+        Amplify.Storage.downloadFile(
+            key,
+            file,
+            options,
+            { progress -> Log.i(TAG, "Fraction completed: ${progress.fractionCompleted}") },
+            { result ->
+                Log.i(TAG, "Successfully downloaded: ${result.file.name}")
+                val imageStream = FileInputStream(file)
+                val image = BitmapFactory.decodeStream(imageStream)
+                completed(image)
+            },
+            { error -> Log.e(TAG, "Download Failure", error) }
         )
     }
 }
