@@ -53,7 +53,7 @@ To follow this tutorial, you need the following tools and resources:
 - [NodeJS 10.x](https://nodejs.org/en/download/) or more recent.
 - AWS Command Line Interface [AWS CLI 2.0.x](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) or more recent.
 
-You can install these tools following these instructions:
+On Linux and Mac, you can install these tools following these instructions:
 
 ```zsh
 # install brew itself

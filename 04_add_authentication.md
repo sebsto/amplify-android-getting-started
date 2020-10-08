@@ -4,7 +4,7 @@ The next feature you will be adding is user authentication. In this module, you 
 
 You will also learn how to use the Cognito Hosted User Interface to present an entire user authentication flow, allowing users to sign up, sign in, and reset their password with just few lines of code.
 
-using a "Hosted User Interface" means the application leverages the Cognito web pages for the signin and signup user interface flows. The user of the app is redirected to a web page hosted by Cognito and redirected back to the app after signin.  Of course, Cognito and Amplify does support native UI as well, you can follow [these workshop instructions](https://amplify-android-workshop.go-aws.com/70_add_custom_gui/30_customized_ui.html) to learn more about custom authentication UI.
+Using a "Hosted User Interface" means the application leverages the Cognito web pages for the sign in and sign up user interface flows. The user of the app is redirected to a web page hosted by Cognito and redirected back to the app after sign in.  Of course, Cognito and Amplify does support native UI as well, you can follow [these workshop instructions](https://amplify-android-workshop.go-aws.com/70_add_custom_gui/30_customized_ui.html) to learn more about custom authentication UI.
 
 ## What you Will Learn
 
@@ -74,11 +74,12 @@ dependencies {
 
 ## Configure Amplify Authentication library at runtime
 
-Back to Android Studio, open `Backend.kt` file.  In the `Backend` class, **add a line** to the amplify initialization code we added in the previous section.
+Back to Android Studio, open `Backend.kt` file.  In the `Backend` class, **add a line** to the amplify initialization code we added in the previous section (in the `initialize()` method).
 
 Complete code block should look like this:
 
 ```kotlin
+// inside Backend class
 fun initialize(applicationContext: Context) : Backend {
     try {
         Amplify.addPlugin(AWSCognitoAuthPlugin())
@@ -92,13 +93,13 @@ fun initialize(applicationContext: Context) : Backend {
 }
 ```
 
-Do not forget to add the import statement, Android Studio does that for you automatically (on Mac click on `Alt + Enter`).
+Do not forget to add the import statements, Android Studio does that for you automatically (on Mac click on `Alt + Enter` on each error detected by the code editor).
 
 To verify everything works as expected, build the project. Click **Build** menu and select **Make Project** or, on Macs, type **&#8984;F9**. There should be no error.
 
 ## Trigger Authentication at Runtime
 
-The remaining code change tracks the status of user (are they signed in or not?) and triggers the SignIn / SignUp user interface when user is not signed in.
+The remaining code change tracks the status of user (are they signed in or not?) and triggers the SignIn / SignUp user interface user click on a lock icon.
 
 1. Add `signIn` and `signOut` methods
 
@@ -134,14 +135,14 @@ The remaining code change tracks the status of user (are they signed in or not?)
 
     ![android studio select amplify package](img/04_10.png)
 
-    Notice that we do not update `UserData.isSignedIn` flag from these method, this is done in the next section.
+    Notice that we do not update `UserData.isSignedIn` flag from these methods, this is done in the next section.
 
 
 2. Add an authentication hub listener
 
     To track the changes of authentication status, we add code to subscribe to Authentication events sent by Amplify. We initialize the Hub in the `Backend.initialize()` method.
 
-    When an authentication event is received, we call the `updateUserData()` method.  This method keeps the `UserData` object in sync.  The `UserData.isSignedIn` property is a `LiveData<Boolean>`, it means `Observers` that are subscribed to this property will be notified when the value changes. We use this mechanism to refresh the user interface automatically.
+    When an authentication event is received, we call the `updateUserData()` method.  This method keeps the `UserData` object in sync.  The `UserData.isSignedIn` property is a `LiveData<Boolean>`, it means `Observers` that are subscribed to this property will be notified when the value changes. We use this mechanism to refresh the user interface automatically. You can [learn more about LiveData in the Android doc](https://developer.android.com/topic/libraries/architecture/livedata).
 
     We also add code to check previous authentication status at application startup time. When the application starts, it checks if a Cognito session already exists and updates the `UserData` accordingly.
 
@@ -229,7 +230,7 @@ The remaining code change tracks the status of user (are they signed in or not?)
 
     ![android studio drawable directory](img/04_40.png)
 
-    Under `java/com.example.androidgettingstarted/`, open `MainActivity.kt` and add the following code.
+    Now, link the newly created button in the code. Under `java/com.example.androidgettingstarted/`, open `MainActivity.kt` and add the following code.
 
     ```kotlin
     // anywhere in the MainActivity class
@@ -269,7 +270,7 @@ The remaining code change tracks the status of user (are they signed in or not?)
     })
     ```
 
-    The above code register an `observer` on `Userdata.isSignedIn` value.  The closure is called when `isSignedIn` value change. Right now, we just change the lock icon : open when the user is authenticated and closed when the user has no session.
+    The above code register an `observer` on `Userdata.isSignedIn` value.  The closure is called when `isSignedIn` value changes. Right now, we just change the lock icon : open when the user is authenticated and closed when the user has no session.
 
     To verify everything works as expected, build the project. Click **Build** menu and select **Make Project** or, on Macs, type **&#8984;F9**. There should be no error.
 
@@ -324,7 +325,7 @@ The remaining code change tracks the status of user (are they signed in or not?)
 Here is the full signup flow.
 
 | Landing View (lock closed) | Cognito Hosted UI |
-| --- | --- | --- |
+| --- | --- |
 | ![Signin button](img/04_50.png) | ![Signin Page](img/04_60.png)
 
 | Signup flow | Verification Code | Main View (lock open) |

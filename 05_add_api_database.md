@@ -112,7 +112,7 @@ GraphQL endpoint: https://yourid.appsync-api.eu-central-1.amazonaws.com/graphql
 
 ## Add API client library to the Android Studio project
 
-Before going to the code, add the following dependency to your app‘s `build.gradle` along with others you added before and click **Sync Now** when prompted:
+Before going to the code, back to Android Studio, add the following dependency to your app‘s `build.gradle` along with others you added before and click **Sync Now** when prompted:
 
 ```gradle
 dependencies {
@@ -122,7 +122,7 @@ dependencies {
 
 ## Initialize Amplify Libs at Runtime
 
-Back to Android Studio, open `Backend.kt` and add a line in the Amplify initialisation sequence in `initialize()` method. Complete try/catch block should lool like this:
+Open `Backend.kt` and add a line in the Amplify initialization sequence in `initialize()` method. Complete try/catch block should look like this:
 
 ```kotlin
 try {
@@ -167,7 +167,7 @@ Be sure to import the `NoteData` class from the generated code.
 
 ## Add API CRUD Methods to the `Backend` Class
 
-Let's add 3 methods to call our API: a method to query the Note, a method to create a new Note, and a method to delete a Note. Notice that these method works on the app data model (`Note`) to make it easy to interract from the User Interface. These method transparently convert `Note` to GraphQL's `NoteData` objects.
+Let's add 3 methods to call our API: a method to query the Note, a method to create a new Note, and a method to delete a Note. Notice that these method works on the app data model (`Note`) to make it easy to interact from the User Interface. These method transparently convert `Note` to GraphQL's `NoteData` objects.
 
 **Open** the `Backend.kt` file and **add the following** snippet at the end of the `Backend` class:
 
@@ -452,11 +452,11 @@ Now that the backend and data model pieces are in place, the last step in this s
 
 To verify everything works as expected, build the project. Click **Build** menu and select **Make Project** or, on Macs, type **&#8984;F9**. There should be no error.    
 
-When you run the application, you see the "Add Note" button appear when user signs in and disappear when user signout. You can now add a note.
+When you run the application, you see the "Add Note" button appear when user signs in and disappear when user sign out. You can now add a note.
 
-## Add a Swipe to Delete Behaviour
+## Add a Swipe to Delete Behavior
 
-The swipe-to-delete behaviour can be added by adding a touch handler to the list of Note. The touch handler is in charge of drawing the red background, the delete icon, and to call the `Backend.delete()` method when the touch is release.
+The swipe-to-delete behavior can be added by adding a touch handler to the list of Note. The touch handler is in charge of drawing the red background, the delete icon, and to call the `Backend.delete()` method when the touch is release.
 
 1. Create a new class SimpleTouchCallback. Under `java/com`, right click `example.androidgettingstarted`, select **New** then **Kotlin File**, enter **SwipeCallback** as name.
 
@@ -580,7 +580,7 @@ The swipe-to-delete behaviour can be added by adding a touch handler to the list
 
 To verify everything works as expected, build and run the project.Click **Run** icon ▶️ in the toolbar or type **^ R**. There should be no error.
 
-Assuming you are still signed in, the app starts on the emply List. It now has a `Add Note` button to add a Note.  **Tap the Add Note sign**, **enter a title**, **enter a description**, **Tap Add Note** button and the note should appear in the list.
+Assuming you are still signed in, the app starts on the empty List. It now has a `Add Note` button to add a Note.  **Tap the Add Note sign**, **enter a title**, **enter a description**, **Tap Add Note** button and the note should appear in the list.
 
 You can delete Note by swiping a row left.
 

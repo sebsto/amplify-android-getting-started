@@ -81,9 +81,9 @@ class UserData private constructor() {
         companion object {
             fun from(noteData : NoteData) : Note {
                 val result = Note(noteData.id, noteData.name, noteData.description, noteData.image)
+                
                 if (noteData.image != null) {
                     Backend.shared.retrieveImage(noteData.image!!) {
-                        //result.setImage(it)
                         result.image = it
 
                         // force a UI update

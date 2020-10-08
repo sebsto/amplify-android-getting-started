@@ -61,7 +61,7 @@ dependencies {
 
 ## Initialize Amplify Storage plugin at runtime
 
-Back to Android Studio, under `java/example.androidgettingstarted`, open `Backend.kit` and add a line in the Amplify initialisation sequence in `initialize()` method. Complete code block should look like this:
+Back to Android Studio, under `java/example.androidgettingstarted`, open `Backend.kit` and add a line in the Amplify initialization sequence in `initialize()` method. Complete code block should look like this:
 
 ```kotlin
 try {
@@ -193,7 +193,7 @@ image.shapeAppearanceModel = image.shapeAppearanceModel
 
 Add the required `import` on `Intent`, `MediaStore` and `CornerFamily`.
 
-Also add this contant value in the companion object:
+Also add this constant value in the companion object:
 
 ```kotlin
 // add this to the companion object 
@@ -281,21 +281,18 @@ if (this.noteImagePath != null) {
 
 ## Load image when Notes are loaded
 
-To load images, we modify the static `from` method on the `Note` data class.  That way, everytime a `NoteData` object returned by the API is converted to a `Note` object, the image is loaded in parallel. When the image is loaded, we notify the LiveData's `UserData` to let observers known about the change. This triggers an UI refresh.
+To load images, we modify the static `from` method on the `Note` data class.  That way, every time a `NoteData` object returned by the API is converted to a `Note` object, the image is loaded in parallel. When the image is loaded, we notify the LiveData's `UserData` to let observers known about the change. This triggers an UI refresh.
 
 Open `UserData.kt` and **modify** the `Note` data class' companion object like this:
 
 ```kotlin
-// bitmap image
-var image : Bitmap? = null
-
 // static function to create a Note from a NoteData API object
 companion object {
     fun from(noteData : NoteData) : Note {
         val result = Note(noteData.id, noteData.name, noteData.description, noteData.image)
+        
         if (noteData.image != null) {
             Backend.shared.retrieveImage(noteData.image!!) {
-                //result.setImage(it)
                 result.image = it
 
                 // force a UI update

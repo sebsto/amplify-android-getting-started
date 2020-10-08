@@ -72,7 +72,7 @@ Initialize the Amplify project structure and configuration file. **Execute the f
 amplify init
 ```
 
-- *? Enter a name for your project (androidgettingstarte)*: accept the default, press **enter**
+- *? Enter a name for your project (androidgettingstarted)*: accept the default, press **enter**
 - *? Enter a name for the environment (dev)*: accept the default, press **enter**
 - *? Choose your default editor*: use the arrow key to select your favorite text editor an press **enter**
 - *? Choose the type of app that you're building*: android is already selected, press **enter**
@@ -82,7 +82,7 @@ amplify init
 
 You can create a profile using AWS CLI using `aws configure --profile <name>` if you don't have one yet.
 
-Amplify initilizes your project in the cloud, it might take a few minutes. After a few minutes, you should see a message like:
+Amplify initializes your project in the cloud, it might take a few minutes. After a few minutes, you should see a message like:
 
 ```zsh
 ✔ Successfully created initial AWS cloud resources for deployments.
@@ -92,7 +92,7 @@ Initialized your environment successfully.
 Your project has been successfully initialized and connected to the cloud!
 ```
 
-## Add Amplify Librairies to your Project
+## Add Amplify Libraries to your Project
 
 Amplify for Android is distributed as Apache Maven packages. In this section, you’ll add the packages and other required directives to your build configuration.
 
@@ -152,7 +152,7 @@ Should you develop in Java or target Android SDK 21 or less, please [check the d
 
 Now, run **Gradle Sync**.
 
-![android studio graddle sync](img/03_10.png)
+![android studio gradle sync](img/03_10.png)
 
 After a while, you should see 
 
@@ -164,7 +164,7 @@ BUILD SUCCESSFUL in 1s
 
 Let's create a `Backend` class to group the code to interact with our backend. I use a [singleton design pattern](https://en.wikipedia.org/wiki/Singleton_pattern) to make it easily available through the application and to ensure the Amplify libraries are initialized only once.
 
-The class initializer takes care of initializing the Amplify librairies.
+The class initializer takes care of initializing the Amplify libraries.
 
 Under `java/com.example.androidgettingstarted` create a new kotlin file `Backend.kt`, open it and add this code:
 

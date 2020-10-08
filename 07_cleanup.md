@@ -4,7 +4,7 @@ Now that you have a full project running, let's explore two options frequently u
 
 ## What You Will Learn
 
-- Sharing an Amplify backend configuration accross projects
+- Sharing an Amplify backend configuration across projects
 - Delete a cloud backend using Amplify CLI 
 
 ## Key Concepts
@@ -29,7 +29,7 @@ amplify pull
 - *? Do you want to use an AWS profile?* accept the default **Yes** and press **enter**
 - *? Please choose the profile you want to use* select the profile you want to use and press **enter**
 - *? Which app are you working on?* select the backend you want to share and press **enter**
-- *? Choose your default editor:* select you prefered text editor and press **enter**
+- *? Choose your default editor:* select you preferred text editor and press **enter**
 - *? Choose the type of app that you're building* select the operating system for your new project and press **enter**
 - *? Do you plan on modifying this backend?* most of the time, select **No** and press **enter**.  All backend modifications can be done from the original Android project.
 
