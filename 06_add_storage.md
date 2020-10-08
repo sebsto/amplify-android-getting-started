@@ -5,8 +5,8 @@ Now that we have the notes app working, let's add the ability to associate an im
 ## What You Will Learn
 
 - Create a storage service
-- Update your IOS app - the logic to upload and download images
-- Update your IOS app - the user interface
+- Update your Android app - the logic to upload and download images
+- Update your Android app - the user interface
 
 ## Key Concepts
 
@@ -51,281 +51,299 @@ Press **Y** to confirm and, after a while, you should see:
 
 ## Add Amplify Storage Libraries to the Android Studio Project
 
-Before going to the code, you add the Amplify Storage Library to the dependencies of your project.  Open the `Podfile` file and **add the line** with `AmplifyPlugins/AWSS3StoragePlugin` or copy / paste the entire file below.
+Before going to the code, add the following dependency to your app‘s `build.gradle` along with others you added before and click **Sync Now** when prompted:
 
-```Podfile
-# you need at least version 13.0 for this tutorial, more recent versions are valid too
-platform :android, '13.0'
-
-target 'getting started' do
-  # Comment the next line if you don't want to use dynamic frameworks
-  use_frameworks!
-
-  # Pods for getting started
-  pod 'Amplify', '~> 1.0'                             # required amplify dependency
-  pod 'Amplify/Tools', '~> 1.0'                       # allows to call amplify CLI from within Android Studio
-
-  pod 'AmplifyPlugins/AWSCognitoAuthPlugin', '~> 1.0' # support for Cognito user authentication
-  pod 'AmplifyPlugins/AWSAPIPlugin', '~> 1.0'         # support for GraphQL API
-  pod 'AmplifyPlugins/AWSS3StoragePlugin', '~> 1.0'   # support for Amazon S3 storage
-
-end
-```
-
-In a terminal, **execute the command**:
-
-```zsh
-pod install
-```
-
-The command takes a few moments to complete. You should see this (actual version numbers may vary):
-
-```text
-Analyzing dependencies
-Downloading dependencies
-Installing AWSS3 (2.14.2)
-Installing AmplifyPlugins 1.0.4
-Generating Pods project
-Integrating client project
-Pod installation complete! There are 5 dependencies from the Podfile and 12 total pods installed.
+```gradle
+dependencies {
+    implementation 'com.amplifyframework:aws-storage-s3:1.4.0'
+}
 ```
 
 ## Initialize Amplify Storage plugin at runtime
 
-Back to Android Studio, open `Backend.swift` and add a line in the Amplify initialisation sequence in `private init()` method. Complete code block should lool like this:
+Back to Android Studio, under `java/example.androidgettingstarted`, open `Backend.kit` and add a line in the Amplify initialisation sequence in `initialize()` method. Complete code block should look like this:
 
-```swift
-// initialize amplify
-do {
-   try Amplify.add(plugin: AWSCognitoAuthPlugin())
-   try Amplify.add(plugin: AWSAPIPlugin(modelRegistration: AmplifyModels()))
-   try Amplify.add(plugin: AWSS3StoragePlugin())
-   try Amplify.configure()
-   print("Initialized Amplify");
-} catch {
-   print("Could not initialize Amplify: \(error)")
+```kotlin
+try {
+    Amplify.addPlugin(AWSCognitoAuthPlugin())
+    Amplify.addPlugin(AWSApiPlugin())
+    Amplify.addPlugin(AWSS3StoragePlugin())
+
+    Amplify.configure(applicationContext)
+
+    Log.i(TAG, "Initialized Amplify")
+} catch (e: AmplifyException) {
+    Log.e(TAG, "Could not initialize Amplify", e)
 }
 ```
 
 ## Add Image CRUD methods to the `Backend` Class
 
-Open `Backedn.swift`. Anywhere in the `Backend` class, **add** the the following methods:
+Still in `Backend.kt`. Anywhere in the `Backend` class, **add** the the following three methods to upload, download and delete image from the Storage:
 
-```Swift
-// MARK: - Image Storage
+```kotlin
+fun storeImage(filePath: String, key: String) {
+    val file = File(filePath)
+    val options = StorageUploadFileOptions.builder()
+        .accessLevel(StorageAccessLevel.PRIVATE)
+        .build()
 
-func storeImage(name: String, image: Data) {
-
-//        let options = StorageUploadDataRequest.Options(accessLevel: .private)
-    Amplify.Storage.uploadData(key: name, data: image,// options: options,
-        progressListener: { progress in
-            // optionlly update a progress bar here
-        }, resultListener: { event in
-            switch event {
-            case .success(let data):
-                print("Image upload completed: \(data)")
-            case .failure(let storageError):
-                print("Image upload failed: \(storageError.errorDescription). \(storageError.recoverySuggestion)")
-        }
-    })
-}
-
-func retrieveImage(name: String, completed: @escaping (Data) -> Void) {
-    Amplify.Storage.downloadData(key: name,
-        progressListener: { progress in
-            // in case you want to monitor progress
-        }, resultListener: { (event) in
-            switch event {
-            case let .success(data):
-                print("Image \(name) loaded")
-                completed(data)
-            case let .failure(storageError):
-                print("Can not download image: \(storageError.errorDescription). \(storageError.recoverySuggestion)")
-            }
-        }
+    Amplify.Storage.uploadFile(
+        key,
+        file,
+        options,
+        { progress -> Log.i(TAG, "Fraction completed: ${progress.fractionCompleted}") },
+        { result -> Log.i(TAG, "Successfully uploaded: " + result.key) },
+        { error -> Log.e(TAG, "Upload failed", error) }
     )
 }
 
-func deleteImage(name: String) {
-    Amplify.Storage.remove(key: name,
-        resultListener: { (event) in
-            switch event {
-            case let .success(data):
-                print("Image \(data) deleted")
-            case let .failure(storageError):
-                print("Can not delete image: \(storageError.errorDescription). \(storageError.recoverySuggestion)")
-            }
-        }
+fun deleteImage(key : String) {
+
+    val options = StorageRemoveOptions.builder()
+        .accessLevel(StorageAccessLevel.PRIVATE)
+        .build()
+
+    Amplify.Storage.remove(
+        key,
+        options,
+        { result -> Log.i(TAG, "Successfully removed: " + result.key) },
+        { error -> Log.e(TAG, "Remove failure", error) }
+    )
+}
+
+fun retrieveImage(key: String, completed : (image: Bitmap) -> Unit) {
+    val options = StorageDownloadFileOptions.builder()
+        .accessLevel(StorageAccessLevel.PRIVATE)
+        .build()
+
+    val file = File.createTempFile("image", ".image")
+
+    Amplify.Storage.downloadFile(
+        key,
+        file,
+        options,
+        { progress -> Log.i(TAG, "Fraction completed: ${progress.fractionCompleted}") },
+        { result ->
+            Log.i(TAG, "Successfully downloaded: ${result.file.name}")
+            val imageStream = FileInputStream(file)
+            val image = BitmapFactory.decodeStream(imageStream)
+            completed(image)
+        },
+        { error -> Log.e(TAG, "Download Failure", error) }
     )
 }
 ```
 
-## Load image when data are retrieved from the API
+These three methods simply call their `Amplify` counterpart. Amplify storage has three file protection levels:
 
-Now that we have our backend functions available, let's load the images when the API call returns.  he central place to add this behaviour is when the app construct a `Note` UI object from the `NoteData` returned by the API.
+- **Public** Accessible by all users
+- **Protected** Readable by all users, but only writable by the creating user
+- **Private** Readable and writable only by the creating user
 
-Open `ContentView.swift` and update the `Note`'s initializer:
-
-```swift
-// add a publishable's object property
-@Published var image : Image?
-
-// update init's code
-convenience init(from data: NoteData) {
-    self.init(id: data.id, name: data.name, description: data.description, image: data.image)
-
-    if let name = self.imageName {
-        // asynchronously download the image
-        Backend.shared.retrieveImage(name: name) { (data) in
-            // update the UI on the main thread
-            DispatchQueue.main.async() {
-                let uim = UIImage(data: data)
-                self.image = Image(uiImage: uim!)
-            }
-        }
-    }
-    // store API object for easy retrieval later
-    self._data = data
-}
-```
-
-When an image name is present in the instance of `Note`, the code calls `retrieveImage`. This is an asynchronous function. It takes a function to call when the image is downloaded. The function creates an `Image` UI object and assign it to the instance of `Note`. Notice that this assignment triggers a User Interface update, hence it happens on the main thread of the application `DispatchQueue.main.async`.
+For this app, we want the images to only be available to the Note owner, we are using the `StorageAccessLevel.PRIVATE` property.
 
 ## Add UI Code to Capture an Image
 
-First, we add generic code to support image capture. This code can be reused in many appications, it shows an image selector allowing the user to chose an image from its image library.
+Next step is to modify the UI to allow the user to select an image from the phone library when clicking the "Add image" button on the `AddNoteACtivity`.
 
-In Android Studio, **create a new swift file** (**&#8984;N**, then select Swift). Name the file `CaptureImageView.swift` file and **add this code**:
+Two changes are necessary: change the "Add Note" activity layout to add an "Add image" button and a image view, and add handler code in the activity class.
 
-```swift
-import Foundation
-import UIKit
-import SwiftUI
+In Android Studio, under `res/layout`, open `AddNoteACtivity.kt` file and **add this Button** element just above the `addNote` button:
 
-struct CaptureImageView {
+```xml
+<!-- after the description EditText -->
+<com.google.android.material.imageview.ShapeableImageView
+    android:id="@+id/image"
+    android:layout_width="match_parent"
+    android:layout_height="280dp"
+    android:layout_margin="16dp"
+    android:scaleType="centerCrop" />
 
-  /// MARK: - Properties
-  @Binding var isShown: Bool
-  @Binding var image: UIImage?
+<!-- after the Space -->
+<Button
+    android:id="@+id/captureImage"
+    style="?android:attr/buttonStyleSmall"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:backgroundTint="#009688"
+    android:text="Add image" />
+```
 
-  func makeCoordinator() -> Coordinator {
-    return Coordinator(isShown: $isShown, image: $image)
-  }
+In Android Studio, under `java/example.androidgettingstarted`, open `AddNoteACtivity.kt` file and **add this code** in the `onCreate()` method:
+
+```kotlin
+// inside onCreate() 
+// Set up the listener for add Image button
+captureImage.setOnClickListener {
+    val i = Intent(
+        Intent.ACTION_GET_CONTENT,
+        MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+    )
+    startActivityForResult(i, SELECT_PHOTO)
 }
 
-class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-  @Binding var isCoordinatorShown: Bool
-  @Binding var imageInCoordinator: UIImage?
-  init(isShown: Binding<Bool>, image: Binding<UIImage?>) {
-    _isCoordinatorShown = isShown
-    _imageInCoordinator = image
-  }
-  func imagePickerController(_ picker: UIImagePickerController,
-                didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-     guard let unwrapImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else { return }
-     imageInCoordinator = unwrapImage
-     isCoordinatorShown = false
-  }
-  func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-     isCoordinatorShown = false
-  }
-}
+// create rounded corners for the image
+image.shapeAppearanceModel = image.shapeAppearanceModel
+    .toBuilder()
+    .setAllCorners(CornerFamily.ROUNDED, 150.0f)
+    .build()
+````
 
-extension CaptureImageView: UIViewControllerRepresentable {
-    func makeUIViewController(context: UIViewControllerRepresentableContext<CaptureImageView>) -> UIImagePickerController {
-        let picker = UIImagePickerController()
-        picker.delegate = context.coordinator
+Add the required `import` on `Intent`, `MediaStore` and `CornerFamily`.
 
-        // picker.sourceType = .camera // on real devices, you can capture image from the camera
-        // see https://medium.com/better-programming/how-to-pick-an-image-from-camera-or-photo-library-in-swiftui-a596a0a2ece
+Also add this contant value in the companion object:
 
-        return picker
+```kotlin
+// add this to the companion object 
+private const val SELECT_PHOTO = 100
+```
+
+Finally, add the code that receive and store the selected image to a temporary file.  
+
+Add the below code anywhere in the `AddNoteACtivity`class :
+
+```kotlin
+//anywhere in the AddNoteActivity class
+
+private var noteImagePath : String? = null
+private var noteImage : Bitmap? = null
+
+override fun onActivityResult(requestCode: Int, resultCode: Int, imageReturnedIntent: Intent?) {
+    super.onActivityResult(requestCode, resultCode, imageReturnedIntent)
+    Log.d(TAG, "Select photo activity result : $imageReturnedIntent")
+    when (requestCode) {
+        SELECT_PHOTO -> if (resultCode == RESULT_OK) {
+            val selectedImageUri : Uri? = imageReturnedIntent!!.data
+
+            // read the stream to fill in the preview
+            var imageStream: InputStream? = contentResolver.openInputStream(selectedImageUri!!)
+            val selectedImage = BitmapFactory.decodeStream(imageStream)
+            val ivPreview: ImageView = findViewById<View>(R.id.image) as ImageView
+            ivPreview.setImageBitmap(selectedImage)
+
+            // store the image to not recreate the Bitmap every time
+            this.noteImage = selectedImage
+
+            // read the stream to store to a file
+            imageStream = contentResolver.openInputStream(selectedImageUri)
+            val tempFile = File.createTempFile("image", ".image")
+            copyStreamToFile(imageStream!!, tempFile)
+
+            // store the path to create a note
+            this.noteImagePath = tempFile.absolutePath
+
+            Log.d(TAG, "Selected image : ${tempFile.absolutePath}")
+        }
     }
+}
 
-    func updateUIViewController(_ uiViewController: UIImagePickerController,
-                                context: UIViewControllerRepresentableContext<CaptureImageView>) {
-
+private fun copyStreamToFile(inputStream: InputStream, outputFile: File) {
+    inputStream.use { input ->
+        val outputStream = FileOutputStream(outputFile)
+        outputStream.use { output ->
+            val buffer = ByteArray(4 * 1024) // buffer size
+            while (true) {
+                val byteCount = input.read(buffer)
+                if (byteCount < 0) break
+                output.write(buffer, 0, byteCount)
+            }
+            output.flush()
+            output.close()
+        }
     }
 }
 ```
 
-## Store image when Notes are created
+The above code consumes the selected image as an InputStream, twice. The first `InputStream` creates a `Bitmap` image to display in the UI, the second `InputStream` saves a temporary file to send to the backend.
+
+I chose to go through a temporary file because the Amplify API consumes `File`objects. I recognized this is not the most efficient design decision, but it made the code as simple as possible.
+
+To verify everything works as expected, build the project. Click **Build** menu and select **Make Project** or, on Macs, type **&#8984;F9**. There should be no error.  
+
+## Store image when Notes are created 
 
 Let's invoke the storage methods from `Backend` when a `Note` is created.
-Open `ContentView.swift` and **modify** the `AddNoteView` to add an `ImagePicker` component:
+Open `AddNoteActivity.kt` and **modify** the `addNote.setOnClickListener()` method, to add the below code after the `Note` object is created.
 
-```swift
-// at the start of the Content View struct 
-@State var image : UIImage? // replace the previous declaration of image
-@State var showCaptureImageView = false
+```kotlin
+// add this in AddNoteACtivity.kt, inside the addNote.setOnClickListener() method and after the Note() object is created.
+if (this.noteImagePath != null) {
+    note.imageName = UUID.randomUUID().toString()
+    //note.setImage(this.noteImage)
+    note.image = this.noteImage
 
-// in the view, replace the existing PICTURE section
-Section(header: Text("PICTURE")) {
-    VStack {
-        Button(action: {
-            self.showCaptureImageView.toggle()
-        }) {
-            Text("Choose photo")
-        }.sheet(isPresented: $showCaptureImageView) {
-            CaptureImageView(isShown: self.$showCaptureImageView, image: self.$image)
-        }
-        if (image != nil ) {
-            HStack {
-                Spacer()
-                Image(uiImage: image!)
-                    .resizable()
-                    .frame(width: 250, height: 200)
-                    .clipShape(Circle())
-                    .overlay(Circle().stroke(Color.white, lineWidth: 4))
-                    .shadow(radius: 10)
-                Spacer()
+    // asynchronously store the image (and assume it will work)
+    Backend.shared.storeImage(this.noteImagePath!!, note.imageName!!)
+}
+```
+
+## Load image when Notes are loaded
+
+To load images, we modify the static `from` method on the `Note` data class.  That way, everytime a `NoteData` object returned by the API is converted to a `Note` object, the image is loaded in parallel. When the image is loaded, we notify the LiveData's `UserData` to let observers known about the change. This triggers an UI refresh.
+
+Open `UserData.kt` and **modify** the `Note` data class' companion object like this:
+
+```kotlin
+// bitmap image
+var image : Bitmap? = null
+
+// static function to create a Note from a NoteData API object
+companion object {
+    fun from(noteData : NoteData) : Note {
+        val result = Note(noteData.id, noteData.name, noteData.description, noteData.image)
+        if (noteData.image != null) {
+            Backend.shared.retrieveImage(noteData.image!!) {
+                //result.setImage(it)
+                result.image = it
+
+                // force a UI update
+                with(shared) { notifyObserver() }
             }
         }
+        return result
     }
 }
 ```
 
-Modify the `Create Note` section to store the image as well as the Note :
+In the same file (`UserData.kt`), in the `UserData` class add this method :
 
-```swift
-Section {
-    Button(action: {
-        self.isPresented = false
+```kotlin
+// add this in UserData class
+fun notifyObserver() {
+    this._notes.notifyObserver()
+}
+```
 
-        let note = Note(id : UUID().uuidString,
-                        name: self.$name.wrappedValue,
-                        description: self.$description.wrappedValue)
+This notifies observers of the List of Notes in `UserData` about a change.  The `RecyclerView` (aka the graphical list of Notes) refreshes the Note when such a change happens. 
 
-        if let i = self.image  {
-            note.imageName = UUID().uuidString
-            note.image = Image(uiImage: i)
+## Delete images when Notes are deleted 
 
-            // asynchronously store the image (and assume it will work)
-            Backend.shared.storeImage(name: note.imageName!, image: (i.pngData())!)
-        }
+The last step is to clean up after ourselves, i.e. to delete images from the cloud storage when a user deletes a Note. If you don't do it to save storage space, do it for your AWS bills as Amazon S3 charges per Gb/month of data stored (the first 5Gb are for free, you will not be charged to run this tutorial).
 
-        // asynchronously store the note (and assume it will succeed)
-        Backend.shared.createNote(note: note)
+Open `SwipeCallback.kt` and add the code below at the end of `onSwipe()` method:
 
-        // add the new note in our userdata, this will refresh UI
-        withAnimation { self.userData.notes.append(note) }
-    }) {
-        Text("Create this note")
-    }
+```kotlin
+if (note?.imageName != null) {
+    //asynchronously delete the image (and assume it will work)
+    Backend.shared.deleteImage(note.imageName!!)
 }
 ```
 
 ## Build and Test
 
-To verify everything works as expected, build and run the project. Click **Product** menu and select **Run** or type **&#8984;R**. There should be no error.
+To verify everything works as expected, build and run the project.Click **Run** icon ▶️ in the toolbar or type **^ R**. There should be no error.
 
-Assuming you are still signed in, the app starts on the list with one Note.  Use the `+` sign again to create a Note. This time, add a picture selected from the local image store.
+Assuming you are still signed in, the app starts on the list of Note you did not delete from the previous section.  Use the `Add Note` button again to create a Note. This time, add a picture selected from the local image store.
+
+Quit the app and restart it to verify that the image is correctly loaded.
 
 Here is the complete flow.
 
-| One Note in the List | Create a Note | Pick Image 1 | Pick Image 2 | Note with Image
-| --- | --- | --- | -- | -- | 
-| ![One Note in the List](img/06_10.png) | ![Create a Note](img/06_20.png) | ![Pick Image 1](img/06_30.png) | ![Pick Image 2](img/06_40.png) | ![Note with Image](img/06_50.png)
+| Create a Note | Pick Image 1 | Pick Image 2 | Create Note |Note with Image
+| --- | --- | -- | -- | -- | 
+| ![Create a Note](img/06_10.png) | ![Pick Image 1](img/06_20.png) | ![Pick Image 2](img/06_30.png) | ![Pick Image 3](img/06_40.png) | ![Note with Image](img/06_50.png)
 
 ## Congratulations 🥁🏆🎊🎉🎈 !
 
