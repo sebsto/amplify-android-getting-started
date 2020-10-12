@@ -56,6 +56,8 @@ To follow this tutorial, you need the following tools and resources:
 On Linux and Mac, you can install these tools following these instructions:
 
 ```zsh
+# file available at https://github.com/sebsto/amplify-android-getting-started/blob/main/install_prerequisites.sh 
+
 # install brew itself
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
