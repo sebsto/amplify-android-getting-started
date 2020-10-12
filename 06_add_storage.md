@@ -304,17 +304,6 @@ companion object {
 }
 ```
 
-In the same file (`UserData.kt`), in the `UserData` class add this method :
-
-```kotlin
-// add this in UserData class
-fun notifyObserver() {
-    this._notes.notifyObserver()
-}
-```
-
-This notifies observers of the List of Notes in `UserData` about a change.  The `RecyclerView` (aka the graphical list of Notes) refreshes the Note when such a change happens. 
-
 ## Delete images when Notes are deleted 
 
 The last step is to clean up after ourselves, i.e. to delete images from the cloud storage when a user deletes a Note. If you don't do it to save storage space, do it for your AWS bills as Amazon S3 charges per Gb/month of data stored (the first 5Gb are for free, you will not be charged to run this tutorial).
