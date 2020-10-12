@@ -340,6 +340,26 @@ class MainActivity : AppCompatActivity() {
 
 - the main activity class observes changes on the list of Notes and create an `NoteRecyclerViewAdapter` to create individual cells.
 
+## Verify the build dependencies
+
+Under **Gradle Scripts**, open **build.gradle (Module:app)** and verify that the generated dependencies are correct.The `libraries versions` need to be checked.
+
+```gradle
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.core:core-ktx:1.3.2'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.0'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.3.0'
+    testImplementation 'junit:junit:4.13'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+}
+```
+
 ## Build and Test
 
 Now build and launch the app in the simulator. Click **Run** icon ▶️ in the toolbar or type **^ R**. 

@@ -197,6 +197,8 @@ The remaining code change tracks the status of user (are they signed in or not?)
     )
     ```
 
+    As in the previous step, add the required `import` statements for each missing class definiton (`Alt + Enter` on red words).
+
     To verify everything works as expected, build the project. Click **Build** menu and select **Make Project** or, on Macs, type **&#8984;F9**. There should be no error.
 
 3. Update the User Interface code
@@ -219,7 +221,7 @@ The remaining code change tracks the status of user (are they signed in or not?)
         />
     ```
 
-    Add a lock icon under `res/drawable`. Right click `drawable`, select **New**, then **Vector Asset**. Enter **ic_baseline_lock** as name and chose the closed lock icon from the Clip Art. Click **Next** and **Finish**.
+    Add a lock icon under `res/drawable`. Right click `drawable`, select **New**, then **Vector Asset**. Chose the lock icon from the clipart and enter **ic_baseline_lock** (without the _24) as name. Click **Next** and **Finish**.
 
     Repeat the same with the open lock icon.
 
@@ -252,7 +254,7 @@ The remaining code change tracks the status of user (are they signed in or not?)
     }
     ```
 
-    Still in `MainActivity`, **add the following code** in the `onCreate()` method:
+    Still in `MainActivity`, **add the following code** at the end of the `onCreate()` method:
 
     ```kotlin
     val userData = UserData.shared

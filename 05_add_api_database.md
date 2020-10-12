@@ -395,7 +395,7 @@ Now that the backend and data model pieces are in place, the last step in this s
     </activity>
     ```
 
-3. At a "Add Note" [FloatingActionButton](https://developer.android.com/reference/com/google/android/material/floatingactionbutton/FloatingActionButton) in the Main Activity. Under `res/layout`, open `activity_main.xml` and add this above the existing Floating Action Button.
+3. Add a "Add Note" [FloatingActionButton](https://developer.android.com/reference/com/google/android/material/floatingactionbutton/FloatingActionButton) in the Main Activity. Under `res/layout`, open `activity_main.xml` and add this above the existing Floating Action Button.
 
     ```xml
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -563,6 +563,9 @@ The swipe-to-delete behavior can be added by adding a touch handler to the list 
     The important lines of code are in the `onSwiped()` method. This method is called when the swipe gesture finishes. We collect the position in the list for the swiped item, and we remove the corresponding note from the `UserData` structure (this updates the UI) and from the cloud backend.
 
 2. Now that we have a class, let's add a "Delete" icon in `res/drawable`. Right click `drawable`, select **New**, then **Vector Asset**. Enter **ic_baseline_delete_sweep** as name and chose the "delete sweep" icon from the Clip Art. Click **Next** and **Finish**.
+
+DO NOT ACCEPT THIS CHANGE: THIS IS A REMARK:
+L'icone dans l'image n'a pas le bon nom (problème de 24 ajouté par Android studio)
 
     ![android studio create add note icon](img/05_45.png)
 
