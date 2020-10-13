@@ -564,9 +564,6 @@ The swipe-to-delete behavior can be added by adding a touch handler to the list 
 
 2. Now that we have a class, let's add a "Delete" icon in `res/drawable`. Right click `drawable`, select **New**, then **Vector Asset**. Enter **ic_baseline_delete_sweep** as name and chose the "delete sweep" icon from the Clip Art. Click **Next** and **Finish**.
 
-DO NOT ACCEPT THIS CHANGE: THIS IS A REMARK:
-L'icone dans l'image n'a pas le bon nom (problème de 24 ajouté par Android studio)
-
     ![android studio create add note icon](img/05_45.png)
 
 3. Add the Swipe to delete gesture handler to the `RecyclerView`.
