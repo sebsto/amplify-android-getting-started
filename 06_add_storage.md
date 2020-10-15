@@ -149,7 +149,7 @@ Next step is to modify the UI to allow the user to select an image from the phon
 
 Two changes are necessary: change the "Add Note" activity layout to add an "Add image" button and a image view, and add handler code in the activity class.
 
-In Android Studio, under `res/layout`, open `AddNoteACtivity.kt` file and **add this Button** element just above the `addNote` button:
+In Android Studio, under `res/layout`, open `activity_add_note.xml` file and **add this Button** element just above the `addNote` button:
 
 ```xml
 <!-- after the description EditText -->
