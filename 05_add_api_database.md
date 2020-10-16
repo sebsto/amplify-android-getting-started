@@ -112,10 +112,14 @@ GraphQL endpoint: https://yourid.appsync-api.eu-central-1.amazonaws.com/graphql
 
 ## Add API client library to the Android Studio project
 
-Before going to the code, back to Android Studio, add the following dependency to your app‘s `build.gradle` along with others you added before and click **Sync Now** when prompted:
+Before going to the code, back to Android Studio, add the following dependency to your module's `build.gradle` along with others `amplifyframework` implementations you added before and click **Sync Now** when prompted:
 
 ```gradle
 dependencies {
+    ...
+
+    // Amplify core dependency
+    implementation 'com.amplifyframework:core:1.4.0'
     implementation 'com.amplifyframework:aws-api:1.4.0'
 }
 ```
