@@ -182,7 +182,7 @@ fun queryNotes() {
             for (noteData in response.data) {
                 Log.i(TAG, noteData.name)
                 // TODO should add all the notes at once instead of one by one (each add triggers a UI refresh)
-                UserData.shared.addNote(UserData.Note.from(noteData))
+                UserData.addNote(UserData.Note.from(noteData))
             }
         },
         { error -> Log.e(TAG, "Query failure", error) }
@@ -235,17 +235,16 @@ In the `Backend.kt`file, update the `updateUserData(withSignInStatus: Boolean)` 
 ```kotlin
 // change our internal state and query list of notes 
 private fun updateUserData(withSignedInStatus : Boolean) {
-    val userData = UserData.shared
-    userData.setSignedIn(withSignedInStatus)
+    UserData.setSignedIn(withSignedInStatus)
 
-    val notes = userData.notes().value
+    val notes = UserData.notes().value
     val isEmpty = notes?.isEmpty() ?: false
 
     // query notes when signed in and we do not have Notes yet
     if (withSignedInStatus && isEmpty ) {
         this.queryNotes()
     } else {
-        userData.resetNotes()
+        UserData.resetNotes()
     }
 }
 ```
@@ -356,8 +355,6 @@ Now that the backend and data model pieces are in place, the last step in this s
 
             addNote.setOnClickListener {
 
-                val userData = UserData.shared
-
                 // create a note object
                 val note = UserData.Note(
                     UUID.randomUUID().toString(),
@@ -366,10 +363,10 @@ Now that the backend and data model pieces are in place, the last step in this s
                 )
 
                 // store it in the backend
-                Backend.shared.createNote(note)
+                Backend.createNote(note)
 
                 // add it to UserData, this will trigger a UI refresh
-                userData.addNote(note)
+                UserData.addNote(note)
 
                 // close activity
                 this.finish()
@@ -428,10 +425,10 @@ Now that the backend and data model pieces are in place, the last step in this s
     }
     ```
 
-    Then, still in the `onCreate()` method replace `userData.isSignedIn.observe` with this :
+    Then, still in the `onCreate()` method replace `UserData.isSignedIn.observe` with this :
 
     ```kotlin
-    userData.isSignedIn.observe(this, Observer<Boolean> { isSignedUp ->
+    UserData.isSignedIn.observe(this, Observer<Boolean> { isSignedUp ->
         // update UI
         Log.i(TAG, "isSignedIn changed : $isSignedUp")
 
@@ -549,13 +546,12 @@ The swipe-to-delete behavior can be added by adding a touch handler to the list 
 
             // get the position of the swiped item in the list
             val position = viewHolder.adapterPosition
-            val userData = UserData.shared
 
             // remove to note from the userdata will refresh the UI
-            val note = userData.deleteNote(position)
+            val note = UserData.deleteNote(position)
 
             // async remove from backend
-            Backend.shared.deleteNote(note)
+            Backend.deleteNote(note)
         }
     }
     ```

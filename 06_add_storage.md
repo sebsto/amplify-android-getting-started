@@ -275,7 +275,7 @@ if (this.noteImagePath != null) {
     note.image = this.noteImage
 
     // asynchronously store the image (and assume it will work)
-    Backend.shared.storeImage(this.noteImagePath!!, note.imageName!!)
+    Backend.storeImage(this.noteImagePath!!, note.imageName!!)
 }
 ```
 
@@ -292,11 +292,11 @@ companion object {
         val result = Note(noteData.id, noteData.name, noteData.description, noteData.image)
         
         if (noteData.image != null) {
-            Backend.shared.retrieveImage(noteData.image!!) {
+            Backend.retrieveImage(noteData.image!!) {
                 result.image = it
 
                 // force a UI update
-                with(shared) { notifyObserver() }
+                with(UserData) { notifyObserver() }
             }
         }
         return result
@@ -313,7 +313,7 @@ Open `SwipeCallback.kt` and add the code below at the end of `onSwipe()` method:
 ```kotlin
 if (note?.imageName != null) {
     //asynchronously delete the image (and assume it will work)
-    Backend.shared.deleteImage(note.imageName!!)
+    Backend.deleteImage(note.imageName!!)
 }
 ```
 

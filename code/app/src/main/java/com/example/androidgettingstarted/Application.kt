@@ -8,6 +8,6 @@ class AndroidGettingStartedApplication : Application() {
         super.onCreate()
 
         // initialize Amplify when application is starting
-        Backend.shared.initialize(applicationContext)
+        Backend.initialize(applicationContext)
     }
 }

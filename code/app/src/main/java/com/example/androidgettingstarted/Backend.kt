@@ -29,13 +29,9 @@ import com.amplifyframework.storage.s3.AWSS3StoragePlugin
 import java.io.File
 import java.io.FileInputStream
 
-class Backend private constructor() {
+object Backend {
 
-    companion object  {
-        private const val TAG = "Backend"
-        var shared : Backend = Backend()
-            private set
-    }
+    private const val TAG = "Backend"
 
     fun initialize(applicationContext: Context) : Backend {
         try {
@@ -100,17 +96,16 @@ class Backend private constructor() {
 
     // change our internal state and query list of notes
     private fun updateUserData(withSignedInStatus : Boolean) {
-        val userData = UserData.shared
-        userData.setSignedIn(withSignedInStatus)
+        UserData.setSignedIn(withSignedInStatus)
 
-        val notes = userData.notes().value
+        val notes = UserData.notes().value
         val isEmpty = notes?.isEmpty() ?: false
 
         // query notes when signed in and we do not have Notes yet
         if (withSignedInStatus && isEmpty ) {
             this.queryNotes()
         } else {
-            userData.resetNotes()
+            UserData.resetNotes()
         }
     }
 
@@ -150,7 +145,7 @@ class Backend private constructor() {
                 for (noteData in response.data) {
                     Log.i(TAG, noteData.name)
                     // TODO should add all the notes at once instead of one by one (each add triggers a UI refresh)
-                    UserData.shared.addNote(UserData.Note.from(noteData))
+                    UserData.addNote(UserData.Note.from(noteData))
                 }
             },
             { error -> Log.e(TAG, "Query failure", error) }

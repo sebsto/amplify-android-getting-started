@@ -176,13 +176,9 @@ import android.util.Log
 import com.amplifyframework.AmplifyException
 import com.amplifyframework.core.Amplify
 
-class Backend private constructor() {
+object Backend {
 
-    companion object  {
-        private const val TAG = "Backend"
-        var shared : Backend = Backend()
-            private set
-    }
+    private const val TAG = "Backend"
 
     fun initialize(applicationContext: Context) : Backend {
         try {
@@ -211,7 +207,7 @@ class AndroidGettingStartedApplication : Application() {
         super.onCreate()
 
         // initialize Amplify when application is starting
-        Backend.shared.initialize(applicationContext)
+        Backend.initialize(applicationContext)
     }
 }
 ```
