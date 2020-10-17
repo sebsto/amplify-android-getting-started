@@ -33,8 +33,6 @@ class AddNoteActivity : AppCompatActivity()  {
 
         addNote.setOnClickListener {
 
-            val userData = UserData.shared
-
             // create a note object
             val note = UserData.Note(
                 UUID.randomUUID().toString(),
@@ -48,14 +46,14 @@ class AddNoteActivity : AppCompatActivity()  {
                 note.image = this.noteImage
 
                 // asynchronously store the image (and assume it will work)
-                Backend.shared.storeImage(this.noteImagePath!!, note.imageName!!)
+                Backend.storeImage(this.noteImagePath!!, note.imageName!!)
             }
 
             // store it in the backend
-            Backend.shared.createNote(note)
+            Backend.createNote(note)
 
             // add it to UserData, this will trigger a UI refresh
-            userData.addNote(note)
+            UserData.addNote(note)
 
             // close activity
             this.finish()

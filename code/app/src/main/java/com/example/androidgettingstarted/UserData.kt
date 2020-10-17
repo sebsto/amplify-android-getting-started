@@ -7,13 +7,9 @@ import androidx.lifecycle.MutableLiveData
 import com.amplifyframework.datastore.generated.model.NoteData
 
 // a singleton to hold user data (this is a ViewModel pattern, without inheriting from ViewModel)
-class UserData private constructor() {
+object UserData {
 
-    companion object {
-        private const val TAG = "UserData"
-        var shared : UserData = UserData()
-            private set
-    }
+    private const val TAG = "UserData"
 
     //
     // observable properties
@@ -83,11 +79,11 @@ class UserData private constructor() {
                 val result = Note(noteData.id, noteData.name, noteData.description, noteData.image)
                 
                 if (noteData.image != null) {
-                    Backend.shared.retrieveImage(noteData.image!!) {
+                    Backend.retrieveImage(noteData.image!!) {
                         result.image = it
 
                         // force a UI update
-                        with(shared) { notifyObserver() }
+                        with(UserData) { notifyObserver() }
                     }
                 }
                 return result

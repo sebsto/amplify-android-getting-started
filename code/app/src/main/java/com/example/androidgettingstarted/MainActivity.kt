@@ -18,9 +18,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        val userData = UserData.shared
-
-        userData.isSignedIn.observe(this, Observer<Boolean> { isSignedUp ->
+        UserData.isSignedIn.observe(this, Observer<Boolean> { isSignedUp ->
             // update UI
             Log.i(TAG, "isSignedIn changed : $isSignedUp")
 
@@ -42,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         setupRecyclerView(item_list)
 
         //setup auth button
-        setupAuthButton(userData)
+        setupAuthButton(UserData)
 
         // register a click listener
         fabAdd.setOnClickListener {
@@ -53,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     // receive the web redirect after authentication
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Backend.shared.handleWebUISignInResponse(requestCode, resultCode, data)
+        Backend.handleWebUISignInResponse(requestCode, resultCode, data)
     }
 
     //setup auth button
@@ -66,10 +64,10 @@ class MainActivity : AppCompatActivity() {
 
             if (userData.isSignedIn.value!!) {
                 authButton.setImageResource(R.drawable.ic_baseline_lock_open)
-                Backend.shared.signOut()
+                Backend.signOut()
             } else {
                 authButton.setImageResource(R.drawable.ic_baseline_lock_open)
-                Backend.shared.signIn(this)
+                Backend.signIn(this)
             }
         }
     }
@@ -77,10 +75,8 @@ class MainActivity : AppCompatActivity() {
     // recycler view is the list of cells
     private fun setupRecyclerView(recyclerView: RecyclerView) {
 
-        val userData = UserData.shared
-
         // update individual cell when the Note data are modified
-        userData.notes().observe(this, Observer<MutableList<UserData.Note>> { notes ->
+        UserData.notes().observe(this, Observer<MutableList<UserData.Note>> { notes ->
             Log.d(TAG, "Note observer received ${notes.size} notes")
 
             // let's create a RecyclerViewAdapter that manages the individual cells

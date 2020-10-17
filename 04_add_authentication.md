@@ -107,8 +107,7 @@ The remaining code change tracks the status of user (are they signed in or not?)
 
     ```kotlin
    private fun updateUserData(withSignedInStatus : Boolean) {
-        val userData = UserData.shared
-        userData.setSignedIn(withSignedInStatus)
+        UserData.setSignedIn(withSignedInStatus)
     }
 
     fun signOut() {
@@ -245,10 +244,10 @@ The remaining code change tracks the status of user (are they signed in or not?)
 
             if (userData.isSignedIn.value!!) {
                 authButton.setImageResource(R.drawable.ic_baseline_lock_open)
-                Backend.shared.signOut()
+                Backend.signOut()
             } else {
                 authButton.setImageResource(R.drawable.ic_baseline_lock_open)
-                Backend.shared.signIn(this)
+                Backend.signIn(this)
             }
         }
     }
@@ -257,10 +256,9 @@ The remaining code change tracks the status of user (are they signed in or not?)
     Still in `MainActivity`, **add the following code** at the end of the `onCreate()` method:
 
     ```kotlin
-    val userData = UserData.shared
-    setupAuthButton(userData)
+    setupAuthButton(UserData)
 
-    userData.isSignedIn.observe(this, Observer<Boolean> { isSignedUp ->
+    UserData.isSignedIn.observe(this, Observer<Boolean> { isSignedUp ->
         // update UI
         Log.i(TAG, "isSignedIn changed : $isSignedUp")
 
@@ -303,7 +301,7 @@ The remaining code change tracks the status of user (are they signed in or not?)
     // receive the web redirect after authentication
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Backend.shared.handleWebUISignInResponse(requestCode, resultCode, data)
+        Backend.handleWebUISignInResponse(requestCode, resultCode, data)
     }
     ```
 
