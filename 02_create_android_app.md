@@ -67,13 +67,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
 // a singleton to hold user data (this is a ViewModel pattern, without inheriting from ViewModel)
-class UserData private constructor() {
+object UserData {
 
-    companion object {
-        private const val TAG = "UserData"
-        var shared : UserData = UserData()
-            private set
-    }
+    private const val TAG = "UserData"
 
     //
     // observable properties
@@ -140,7 +136,7 @@ These two properties are implemented according to the `LiveData` publish / subsc
 
 We also added a `Note` [data class](https://kotlinlang.org/docs/reference/data-classes.html), just to hold the data of individual notes. I used two distinct properties for `ImageName` and `Image`. I will take care of `Image` later on in section [06 Add Storage](o6_add_storage.md)
 
-I choose to implement the [singleton design pattern](https://en.wikipedia.org/wiki/Singleton_pattern) for the `UserData` class, it allows me to refer to it from anywhere in the application just with `UserData.shared`.
+I choose to implement the [singleton design pattern](https://en.wikipedia.org/wiki/Singleton_pattern) for the `UserData` object, it allows me to refer to it from anywhere in the application just with `UserData`.
 
 ## Add GUI for individual cells in the list
 
@@ -317,10 +313,8 @@ class MainActivity : AppCompatActivity() {
     // recycler view is the list of cells
     private fun setupRecyclerView(recyclerView: RecyclerView) {
 
-        val userData = UserData.shared
-
         // update individual cell when the Note data are modified
-        userData.notes().observe(this, Observer<MutableList<UserData.Note>> { notes ->
+        UserData.notes().observe(this, Observer<MutableList<UserData.Note>> { notes ->
             Log.d(TAG, "Note observer received ${notes.size} notes")
 
             // let's create a RecyclerViewAdapter that manages the individual cells
