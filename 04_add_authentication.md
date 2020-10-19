@@ -103,7 +103,7 @@ The remaining code change tracks the status of user (are they signed in or not?)
 
 1. Add `signIn` and `signOut` methods
 
-    Anywhere in `Backend` class, add the following four methods:
+    Anywhere in `Backend` class, add the following three methods:
 
     ```kotlin
    private fun updateUserData(withSignedInStatus : Boolean) {
