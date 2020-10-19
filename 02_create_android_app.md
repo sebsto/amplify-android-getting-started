@@ -339,6 +339,8 @@ class MainActivity : AppCompatActivity() {
 Under **Gradle Scripts**, open **build.gradle (Module:app)** and verify that the generated dependencies are correct.The `libraries versions` need to be checked.
 
 ```gradle
+apply plugin: 'kotlin-android-extensions'
+
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
