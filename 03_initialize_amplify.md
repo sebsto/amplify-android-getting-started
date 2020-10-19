@@ -80,7 +80,9 @@ amplify init
 - *? Do you want to use an AWS profile?*, Y, press **enter**
 - *? Please choose the profile you want to use*: use the arrow keys to select your profile and press **enter**.
 
-You can create a profile using AWS CLI using `aws configure --profile <name>` if you don't have one yet.
+During this tutorial, we will use Amplify in order to leverage Cognito, AWS AppSync, Amazon DynamoDB and Amazon S3. You can verify the availability for a given region of those services in our [regional services list](https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/). Please be aware that your AWS CLI should target a region where those services are availble.
+
+You can add or update a profile using AWS CLI using `aws configure --profile <name>`. You can also [configure a new user](https://docs.amplify.aws/cli/start/install#option-2-follow-the-instructions) for the tutorial using `amplify configure`.
 
 Amplify initializes your project in the cloud, it might take a few minutes. After a few minutes, you should see a message like:
 
