@@ -51,10 +51,16 @@ Press **Y** to confirm and, after a while, you should see:
 
 ## Add Amplify Storage Libraries to the Android Studio Project
 
-Before going to the code, add the following dependency to your app‘s `build.gradle` along with others you added before and click **Sync Now** when prompted:
+Before going to the code, back to Android Studio, add the following dependency to your module's `build.gradle` along with others `amplifyframework` implementations you added before and click **Sync Now** when prompted:
 
 ```gradle
 dependencies {
+    ...
+
+    // Amplify core dependency
+    implementation 'com.amplifyframework:core:1.4.0'
+    implementation 'com.amplifyframework:aws-auth-cognito:1.4.0'
+    implementation 'com.amplifyframework:aws-api:1.4.0'
     implementation 'com.amplifyframework:aws-storage-s3:1.4.0'
 }
 ```
