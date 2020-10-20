@@ -214,13 +214,13 @@ The remaining code change tracks the status of user (are they signed in or not?)
         android:layout_alignParentRight="true"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_baseline_lock"
+        android:src="@drawable/ic_baseline_lock_24"
         app:fabCustomSize="60dp"
         app:fabSize="auto"
         />
     ```
 
-    Add a lock icon under `res/drawable`. Right click `drawable`, select **New**, then **Vector Asset**. Chose the lock icon from the clipart and enter **ic_baseline_lock** (without the _24) as name. Click **Next** and **Finish**.
+    Add a lock icon under `res/drawable`. Right click `drawable`, select **New**, then **Vector Asset**. Chose the lock icon from the clipart and enter **ic_baseline_lock_24** as name. Click **Next** and **Finish**.
 
     Repeat the same with the open lock icon.
 
@@ -243,10 +243,10 @@ The remaining code change tracks the status of user (are they signed in or not?)
             val authButton = view as FloatingActionButton
 
             if (userData.isSignedIn.value!!) {
-                authButton.setImageResource(R.drawable.ic_baseline_lock_open)
+                authButton.setImageResource(R.drawable.ic_baseline_lock_open_24)
                 Backend.signOut()
             } else {
-                authButton.setImageResource(R.drawable.ic_baseline_lock_open)
+                authButton.setImageResource(R.drawable.ic_baseline_lock_open_24)
                 Backend.signIn(this)
             }
         }
@@ -263,9 +263,9 @@ The remaining code change tracks the status of user (are they signed in or not?)
         Log.i(TAG, "isSignedIn changed : $isSignedUp")
 
         if (isSignedUp) {
-            fabAuth.setImageResource(R.drawable.ic_baseline_lock_open)
+            fabAuth.setImageResource(R.drawable.ic_baseline_lock_open_24)
         } else {
-            fabAuth.setImageResource(R.drawable.ic_baseline_lock)
+            fabAuth.setImageResource(R.drawable.ic_baseline_lock_24)
         }
     })
     ```
