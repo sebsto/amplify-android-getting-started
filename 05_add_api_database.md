@@ -389,7 +389,7 @@ Now that the backend and data model pieces are in place, the last step in this s
     <activity
         android:name=".AddNoteActivity"
         android:label="Add Note"
-        android:theme="@style/AppTheme.NoActionBar">
+        android:theme="@style/Theme.Design.NoActionBar">
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
             android:value="com.example.androidgettingstarted.MainActivity" />
