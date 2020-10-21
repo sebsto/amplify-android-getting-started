@@ -64,10 +64,14 @@ Test Your Hosted UI Endpoint: https://androidgettingstarted-dev.auth.eu-central-
 
 ## Add Amplify Authentication Library to the Project
 
-Before going to the code, add the following dependency to your app‘s `build.gradle` along with others you added before and click **Sync Now** when prompted:
+Before going to the code, back to Android Studio, add the following dependency to your module's `build.gradle` along with others `amplifyframework` implementations you added before and click **Sync Now** when prompted:
 
 ```gradle
 dependencies {
+    ...
+
+    // Amplify core dependency
+    implementation 'com.amplifyframework:core:1.4.0'
     implementation 'com.amplifyframework:aws-auth-cognito:1.4.0'
 }
 ```
