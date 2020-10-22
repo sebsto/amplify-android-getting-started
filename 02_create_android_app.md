@@ -48,6 +48,16 @@ Under `res/layout` and `java/com.example.androidgettingstarted` delete the four 
 
 ![android studio delete unused files](img/02_40.png)
 
+Under **Gradle Scripts**, open **build.gradle (Module:app)** and add the Kotlin Extension plugin.
+
+```
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-android-extensions' //  <== add this line
+}
+```
+
 ## Create a UserData data class
 
 The `UserData` class holds the user state : a `isSignedIn` flag and a list of `Note` values.
