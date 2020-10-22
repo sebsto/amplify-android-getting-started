@@ -223,7 +223,7 @@ Under `manifests`, open `AndroidManifest.xml` and add the name of the applicatio
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/Theme.GettingStartedAndroid">
 ...
 ```
 
