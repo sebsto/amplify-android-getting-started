@@ -16,7 +16,7 @@ This is a screenshot of the final application we are building in this tutorial.
 
 ## Key Concepts
 
-- [Kotlin](https://developer.android.com/kotlin) - I choose to use the Kotlin programming language for this tutorial, because it allows to reduce much of the boilerplate code and it is designed with type safety in mind. 
+- [Kotlin](https://developer.android.com/kotlin) was chosen as the programming language for this tutorial because it allows you to reduce much of the boilerplate code and it is designed with type safety in mind.
 - [Jetpack](https://developer.android.com/jetpack) - This tutorial uses Android's Jetpack, a collection of Android libraries that incorporate best practices and provide backwards compatibility in your Android apps.
 
 # Implementation
@@ -144,13 +144,13 @@ The `UserData` class is responsible to hold user data, namely a `isSignedIn` fla
 
 These two properties are implemented according to the `LiveData` publish / subscribe framework. It allows the Graphical User Interface (GUI) to subscribe to changes and to react accordingly. To learn more about `LiveData`, you can read [this doc](https://developer.android.com/topic/libraries/architecture/livedata) or follow [this short video tutorial](https://www.youtube.com/watch?v=OMcDk2_4LSk). To follow best practice, I keep the `MutableLiveData` property private and only expose the readonly `LiveData` property. Some [additional boilerplate code](https://stackoverflow.com/a/52075248/663360) is required when the data to publish is a list, as I want to make sure observers are notified when individual components in the list are modified.
 
-We also added a `Note` [data class](https://kotlinlang.org/docs/reference/data-classes.html), just to hold the data of individual notes. I used two distinct properties for `ImageName` and `Image`. I will take care of `Image` later on in section [06 Add Storage](o6_add_storage.md)
+We also added a `Note` [data class](https://kotlinlang.org/docs/reference/data-classes.html), just to hold the data of individual notes. I used two distinct properties for `ImageName` and `Image`. I will take care of `Image` later on in section [6 Add Storage](06_add_storage.md)
 
 I choose to implement the [singleton design pattern](https://en.wikipedia.org/wiki/Singleton_pattern) for the `UserData` object, it allows me to refer to it from anywhere in the application just with `UserData`.
 
 ## Add GUI for individual cells in the list
 
-Individual cells in a scrolling list are called [RecyclerView](https://developer.android.com/guide/topics/ui/layout/recyclerview), as the View can be recycled when the user scrolls up and down, when the view is not visible on the screen anymore. 
+An individual cell in a scrolling list is a [RecyclerView](https://developer.android.com/guide/topics/ui/layout/recyclerview), as the underlying View can be recycled when the user scrolls up and down, when the view is not visible on the screen anymore. 
 
 Just like for a regular View, we create a layout XML files and a Kotlin class. A individual cell looks like this:
 
@@ -340,9 +340,9 @@ class MainActivity : AppCompatActivity() {
 
 ### What did we just add?
 
-- the main layout is a [RecyclerView](https://developer.android.com/guide/topics/ui/layout/recyclerview) that manage the list of individual cells we created previously 
+- the main layout is a [RecyclerView](https://developer.android.com/guide/topics/ui/layout/recyclerview) that manages the list of individual cells we created previously 
 
-- the main activity class observes changes on the list of Notes and create an `NoteRecyclerViewAdapter` to create individual cells.
+- the main activity class observes changes on the list of Notes and creates an `NoteRecyclerViewAdapter` to create individual cells.
 
 ## Verify the build dependencies
 

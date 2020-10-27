@@ -14,7 +14,7 @@ This tutorial will walk you through the steps to create a simple Android applica
 
 - Add a GraphQL API, database, and storage solution
 
-- Share your backend between multiple projects.
+- Share your backend between multiple projects
 
 ## Modules
 

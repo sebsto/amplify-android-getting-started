@@ -64,7 +64,7 @@ Test Your Hosted UI Endpoint: https://androidgettingstarted-dev.auth.eu-central-
 
 ## Add Amplify Authentication Library to the Project
 
-Before going to the code, back to Android Studio, add the following dependency to your module's `build.gradle` along with others `amplifyframework` implementations you added before and click **Sync Now** when prompted:
+Before going to the code, go back to Android Studio and add the following dependency to your module's `build.gradle` along with others `amplifyframework` implementations you added earlier and click **Sync Now** when prompted:
 
 ```gradle
 dependencies {
@@ -103,7 +103,7 @@ To verify everything works as expected, build the project. Click **Build** menu 
 
 ## Trigger Authentication at Runtime
 
-The remaining code change tracks the status of user (are they signed in or not?) and triggers the SignIn / SignUp user interface user click on a lock icon.
+The remaining code change tracks the status of a user (are they signed in or not?) and triggers the SignIn / SignUp user interface when a user clicks on a lock icon.
 
 1. Add `signIn` and `signOut` methods
 
@@ -134,7 +134,7 @@ The remaining code change tracks the status of user (are they signed in or not?)
     }
     ```
 
-    Then add the required `import` statements for each missing class definiton (`Alt + Enter` on red words). When you have choice between multiple classes, be sure to select the one from the `amplify` package, as shown on the screenshot below.
+    Then add the required `import` statements for each missing class definiton (`Alt + Enter` on red words). When you have choice between multiple classes, be sure to select the one from the `Amplify` package, as shown on the screenshot below.
 
     ![android studio select amplify package](img/04_10.png)
 

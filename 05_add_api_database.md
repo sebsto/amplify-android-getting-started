@@ -50,13 +50,13 @@ amplify add api
     }
     ```
 
-    The data model is made of one class `NoteData` and 4 properties : `id` and `name` are mandatory. `description` and `image` are optional Strings.
+    The data model is made of one class `NoteData` and 4 properties : `id` and `name` are mandatory, and `description` and `image` are optional Strings.
 
-    The `@model` transfomer indicates we want to create a database to store these data.
+    The `@model` transfomer indicates we want to create a database to store this data.
 
-    The `@auth` transformer adds authentication rules to allow access to these data. For this project, we want only the owner of `NoteData`s to have access to them.
+    The `@auth` transformer adds authentication rules to allow access to this data. For this project, we want only the owner of `NoteData`s to have access to them.
 
-    Once done, do not forget to **save**, go back to your terminal to tell Amplify CLI you're done.
+    Once done, do not forget to **save**, then go back to your terminal to tell Amplify CLI you're done.
 
 - *? Press enter to continue*, press **enter**.
 
@@ -112,7 +112,7 @@ GraphQL endpoint: https://yourid.appsync-api.eu-central-1.amazonaws.com/graphql
 
 ## Add API client library to the Android Studio project
 
-Before going to the code, back to Android Studio, add the following dependency to your module's `build.gradle` along with others `amplifyframework` implementations you added before and click **Sync Now** when prompted:
+Before going to the code, back to Android Studio, add the following dependency to your module's `build.gradle` along with others `amplifyframework` implementations you added earlier and click **Sync Now** when prompted:
 
 ```gradle
 dependencies {
@@ -125,7 +125,7 @@ dependencies {
 }
 ```
 
-## Initialize Amplify Libs at Runtime
+## Initialize Amplify Libraries at Runtime
 
 Open `Backend.kt` and add a line in the Amplify initialization sequence in `initialize()` method. Complete try/catch block should look like this:
 
@@ -143,7 +143,7 @@ try {
 
 ## Add bridging between GraphQL data model and app model
 
-Our project already has a data model to represent a `Note`. So I made a design decision to continue to use that model and provide for an easy way to convert a `NoteData` to a `Note`.
+Our project already has a data model to represent a `Note`. In this tutorial we will continue to use that model and provide for an easy way to convert a `NoteData` to a `Note`.
 Open `UserData.kt` and add two components : a dynamic property that returns a `NoteData` object from a `UserData.Note`, and the opposite : a static method that accepts an API `NoteData` and return a `Userdata.Note`.
 
 Inside the data class `Note`, add the following:
@@ -172,7 +172,7 @@ Be sure to import the `NoteData` class from the generated code.
 
 ## Add API CRUD Methods to the `Backend` Class
 
-Let's add 3 methods to call our API: a method to query the Note, a method to create a new Note, and a method to delete a Note. Notice that these method works on the app data model (`Note`) to make it easy to interact from the User Interface. These method transparently convert `Note` to GraphQL's `NoteData` objects.
+Let's add 3 methods to call our API: a method to query the Note, a method to create a new Note, and a method to delete a Note. Notice that these methods work on the app data model (`Note`) to make it easy to interact from the User Interface. These methods transparently convert `Note` to GraphQL's `NoteData` objects.
 
 **Open** the `Backend.kt` file and **add the following** snippet at the end of the `Backend` class:
 
@@ -254,7 +254,7 @@ private fun updateUserData(withSignedInStatus : Boolean) {
 }
 ```
 
-Now, all is left is to create a piece of user interface to create a new `Note` and to delete a `Note` from the list.
+Now, all that is left is to create a piece of user interface to create a new `Note` and to delete a `Note` from the list.
 
 ## Add an Add Button to Add Note
 
@@ -454,9 +454,9 @@ Now that the backend and data model pieces are in place, the last step in this s
 
 To verify everything works as expected, build the project. Click **Build** menu and select **Make Project** or, on Macs, type **&#8984;F9**. There should be no error.    
 
-When you run the application, you see the "Add Note" button appear when user signs in and disappear when user sign out. You can now add a note.
+When you run the application, you will see the "Add Note" button appear when user signs in and disappear when user sign out. You can now add a note.
 
-## Add a Swipe to Delete Behavior
+## Add a Swipe-to-Delete Behavior
 
 The swipe-to-delete behavior can be added by adding a touch handler to the list of Note. The touch handler is in charge of drawing the red background, the delete icon, and to call the `Backend.delete()` method when the touch is release.
 
@@ -579,7 +579,7 @@ The swipe-to-delete behavior can be added by adding a touch handler to the list 
 
 ## Build and Test
 
-To verify everything works as expected, build and run the project.Click **Run** icon ▶️ in the toolbar or type **^ R**. There should be no error.
+To verify everything works as expected, build and run the project. Click **Run** icon ▶️ in the toolbar or type **^ R**. There should be no error.
 
 Assuming you are still signed in, the app starts on the empty List. It now has a `Add Note` button to add a Note.  **Tap the Add Note sign**, **enter a title**, **enter a description**, **Tap Add Note** button and the note should appear in the list.
 

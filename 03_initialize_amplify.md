@@ -7,7 +7,7 @@ To start to use AWS Amplify in your application, you must install the Amplify co
 ## What you Will Learn
 
 - Initialize a new Amplify project
-- Add Amplify Libraries in your project
+- Add Amplify Libraries to your project
 - Initialize Amplify libraries at runtime
 
 ## Key Concepts
@@ -37,7 +37,7 @@ amplify --version
 
 ## Initialize an Amplify Backend
 
-To create the basic structure of our backend, we first need to initialize the amplify project directory and to create our cloud backend.
+To create the basic structure of our backend, we first need to initialize the Amplify project directory and to create our cloud backend.
 
 Open a Terminal and change to the directory of your project. For example, if you created your project in the folder `~/AndroidStudioProjects/android-getting-started`, you can type:
 
@@ -148,7 +148,7 @@ dependencies {
 }
 ```
 
-Should you develop in Java or target Android SDK 21 or less, please [check the documentation](https://docs.amplify.aws/lib/project-setup/create-application/q/platform/android#n2-install-amplify-libraries) for additional configuration changes.
+Should you develop in Java or target Android SDK 21 or earlier, please [check the documentation](https://docs.amplify.aws/lib/project-setup/create-application/q/platform/android#n2-install-amplify-libraries) for additional configuration changes.
 
 Now, run **Gradle Sync**.
 

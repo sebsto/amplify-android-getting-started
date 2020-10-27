@@ -51,7 +51,7 @@ Press **Y** to confirm and, after a while, you should see:
 
 ## Add Amplify Storage Libraries to the Android Studio Project
 
-Before going to the code, back to Android Studio, add the following dependency to your module's `build.gradle` along with others `amplifyframework` implementations you added before and click **Sync Now** when prompted:
+Before going to the code, back to Android Studio, add the following dependency to your module's `build.gradle` along with others `amplifyframework` implementations you added earlier and click **Sync Now** when prompted:
 
 ```gradle
 dependencies {
@@ -264,7 +264,7 @@ private fun copyStreamToFile(inputStream: InputStream, outputFile: File) {
 
 The above code consumes the selected image as an InputStream, twice. The first `InputStream` creates a `Bitmap` image to display in the UI, the second `InputStream` saves a temporary file to send to the backend.
 
-I chose to go through a temporary file because the Amplify API consumes `File`objects. I recognized this is not the most efficient design decision, but it made the code as simple as possible.
+This code uses a temporary file because the Amplify API consumes `File`objects. I recognized this is not the most efficient design decision, but it made the code as simple as possible.
 
 To verify everything works as expected, build the project. Click **Build** menu and select **Make Project** or, on Macs, type **&#8984;F9**. There should be no error.  
 
@@ -287,7 +287,7 @@ if (this.noteImagePath != null) {
 
 ## Load image when Notes are loaded
 
-To load images, we modify the static `from` method on the `Note` data class.  That way, every time a `NoteData` object returned by the API is converted to a `Note` object, the image is loaded in parallel. When the image is loaded, we notify the LiveData's `UserData` to let observers known about the change. This triggers an UI refresh.
+To load images, we modify the static `from` method on the `Note` data class.  That way, every time a `NoteData` object returned by the API is converted to a `Note` object, the image is loaded in parallel. When the image is loaded, we notify the LiveData's `UserData` to let observers known about the change. This triggers a UI refresh.
 
 Open `UserData.kt` and **modify** the `Note` data class' companion object like this:
 
