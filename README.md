@@ -1,4 +1,4 @@
-This is the editable material for Amplify's "[Android Getting Started](https://aws.amazon.com/getting-started/hands-on/build-android-app-amplify/?e=gs2020&p=frontend" guide.
+This is the editable material for Amplify's [Android Getting Started](https://aws.amazon.com/getting-started/hands-on/build-android-app-amplify/?e=gs2020&p=frontend" guide.
 
 Other front-end Amplify hands on tutorial :
 - [Amplify's iOS Getting Started](https://aws.amazon.com/getting-started/hands-on/build-ios-app-amplify/)
