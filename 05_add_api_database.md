@@ -408,12 +408,12 @@ Now that the backend and data model pieces are in place, the last step in this s
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:visibility="invisible"
-        android:src="@drawable/ic_baseline_post_add"
+        android:src="@drawable/ic_baseline_post_add_24"
         app:fabCustomSize="60dp"
         app:fabSize="auto"/>
     ```
 
-    Add a "Add Note" icon in `res/drawable`. Right click `drawable`, select **New**, then **Vector Asset**. Enter **ic_baseline_add** as name and chose the add icon from the Clip Art. Click **Next** and **Finish**.
+    Add a "Add Note" icon in `res/drawable`. Right click `drawable`, select **New**, then **Vector Asset**. Enter **ic_baseline_post_add_24** as name and chose the add icon from the Clip Art. Click **Next** and **Finish**.
 
     ![android studio create add note icon](img/05_20.png)
 
@@ -439,12 +439,12 @@ Now that the backend and data model pieces are in place, the last step in this s
 
         //animation inspired by https://www.11zon.com/zon/android/multiple-floating-action-button-android.php
         if (isSignedUp) {
-            fabAuth.setImageResource(R.drawable.ic_baseline_lock_open)
+            fabAuth.setImageResource(R.drawable.ic_baseline_lock_open_24)
             Log.d(TAG, "Showing fabADD")
             fabAdd.show()
             fabAdd.animate().translationY(0.0F - 1.1F * fabAuth.customSize)
         } else {
-            fabAuth.setImageResource(R.drawable.ic_baseline_lock)
+            fabAuth.setImageResource(R.drawable.ic_baseline_lock_24)
             Log.d(TAG, "Hiding fabADD")
             fabAdd.hide()
             fabAdd.animate().translationY(0.0F)
@@ -490,7 +490,7 @@ The swipe-to-delete behavior can be added by adding a touch handler to the list 
         private val TAG: String = "SimpleItemTouchCallback"
         private val icon: Drawable? = ContextCompat.getDrawable(
             activity,
-            R.drawable.ic_baseline_delete_sweep
+            R.drawable.ic_baseline_delete_sweep_24
         )
         private val background: ColorDrawable = ColorDrawable(Color.RED)
 
@@ -563,7 +563,7 @@ The swipe-to-delete behavior can be added by adding a touch handler to the list 
 
     The important lines of code are in the `onSwiped()` method. This method is called when the swipe gesture finishes. We collect the position in the list for the swiped item, and we remove the corresponding note from the `UserData` structure (this updates the UI) and from the cloud backend.
 
-2. Now that we have a class, let's add a "Delete" icon in `res/drawable`. Right click `drawable`, select **New**, then **Vector Asset**. Enter **ic_baseline_delete_sweep** as name and chose the "delete sweep" icon from the Clip Art. Click **Next** and **Finish**.
+2. Now that we have a class, let's add a "Delete" icon in `res/drawable`. Right click `drawable`, select **New**, then **Vector Asset**. Enter **ic_baseline_delete_sweep_24** as name and chose the "delete sweep" icon from the Clip Art. Click **Next** and **Finish**.
 
     ![android studio create add note icon](img/05_45.png)
 

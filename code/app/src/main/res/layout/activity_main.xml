@@ -30,7 +30,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:visibility="invisible"
-        android:src="@drawable/ic_baseline_post_add"
+        android:src="@drawable/ic_baseline_post_add_24"
         app:fabCustomSize="60dp"
         app:fabSize="auto"/>
 
@@ -41,7 +41,7 @@
         android:layout_alignParentRight="true"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_baseline_lock"
+        android:src="@drawable/ic_baseline_lock_24"
         app:fabCustomSize="60dp"
         app:fabSize="auto"
         />

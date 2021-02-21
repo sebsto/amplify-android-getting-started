@@ -21,7 +21,7 @@ class SwipeCallback(private val activity: AppCompatActivity): ItemTouchHelper.Si
     private val TAG: String = "SimpleItemTouchCallback"
     private val icon: Drawable? = ContextCompat.getDrawable(
         activity,
-        R.drawable.ic_baseline_delete_sweep
+        R.drawable.ic_baseline_delete_sweep_24
     )
     private val background: ColorDrawable = ColorDrawable(Color.RED)
 

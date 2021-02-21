@@ -24,12 +24,12 @@ class MainActivity : AppCompatActivity() {
 
             //animation inspired by https://www.11zon.com/zon/android/multiple-floating-action-button-android.php
             if (isSignedUp) {
-                fabAuth.setImageResource(R.drawable.ic_baseline_lock_open)
+                fabAuth.setImageResource(R.drawable.ic_baseline_lock_open_24)
                 Log.d(TAG, "Showing fabADD")
                 fabAdd.show()
                 fabAdd.animate().translationY(0.0F - 1.1F * fabAuth.customSize)
             } else {
-                fabAuth.setImageResource(R.drawable.ic_baseline_lock)
+                fabAuth.setImageResource(R.drawable.ic_baseline_lock_24)
                 Log.d(TAG, "Hiding fabADD")
                 fabAdd.hide()
                 fabAdd.animate().translationY(0.0F)
@@ -63,10 +63,10 @@ class MainActivity : AppCompatActivity() {
             val authButton = view as FloatingActionButton
 
             if (userData.isSignedIn.value!!) {
-                authButton.setImageResource(R.drawable.ic_baseline_lock_open)
+                authButton.setImageResource(R.drawable.ic_baseline_lock_open_24)
                 Backend.signOut()
             } else {
-                authButton.setImageResource(R.drawable.ic_baseline_lock_open)
+                authButton.setImageResource(R.drawable.ic_baseline_lock_open_24)
                 Backend.signIn(this)
             }
         }
